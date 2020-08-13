@@ -38,8 +38,8 @@ android {
 
 dependencies {
 
-    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'ir.map:map-sdk:4.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"

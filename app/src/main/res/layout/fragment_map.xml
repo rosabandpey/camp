@@ -7,14 +7,13 @@
     tools:context=".view.MapFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="346dp"
-        android:text="map"
-        android:visibility="visible"
-        android:gravity="center"
-        />
 
+    <ir.map.sdk_map.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:mapbox_cameraZoomMax="20"
+        mapbox:mapbox_cameraZoomMin="1" />
 
 
 

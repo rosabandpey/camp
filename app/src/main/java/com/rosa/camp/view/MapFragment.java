@@ -15,6 +15,10 @@ import android.widget.ImageView;
 
 import ir.map.sdk_map.maps.MapView;
 import ir.map.sdk_map.MapirStyle;
+
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.rosa.camp.R;
 
 /**
@@ -25,7 +29,9 @@ import com.rosa.camp.R;
 public class MapFragment extends Fragment {
 
 
-    View mapView;
+    MapboxMap map;
+    Style mapStyle;
+    MapView mapView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -72,17 +78,29 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       // View view= inflater.inflate(R.layout.fragment_map, container, false);
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View view= inflater.inflate(R.layout.fragment_map, container, false);
+        mapView = view.findViewById(R.id.map_view);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                map = mapboxMap;
+                map.setStyle(new Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE), new Style.OnStyleLoaded() {
+                    @Override
+                    public void onStyleLoaded(@NonNull Style style) {
+                        mapStyle = style;
+                        // TODO;
+                    }
+                });
+            }
 
-       // MapView mapView =  findViewById(R.id.map_view);
-       // mapView.onCreate(savedInstanceState);
+        });
 
 
 
 
 
-
+        return view;
 
     }
 }
