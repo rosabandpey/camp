@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:rowCount="5"
+    android:columnCount="1"
+    tools:context=".view.ProfileActivity">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/profileImage"
+        app:layout_row="1"
+        app:layout_column="0"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/name"
+        android:text="name"
+        android:textSize="20dp"
+        app:layout_row="2"
+        app:layout_column="0"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/email"
+        android:textSize="20dp"
+        android:text="email"
+        app:layout_row="3"
+        app:layout_column="0"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/userId"
+        android:textSize="20dp"
+        app:layout_row="4"
+        app:layout_column="0"
+        android:text="id"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/logoutBtn"
+        app:layout_row="5"
+        app:layout_column="0"
+        android:text="Logout"
+        android:layout_marginTop="30dp"/>
+
+
+</GridLayout>

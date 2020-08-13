@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<layout xmlns:bind="http://schemas.android.com/tools">
+
+<data  >
+    <variable
+        name="RejisterViewModel"
+        type="com.rosa.camp.viewModel.RejisterViewModel" />
+</data>
+
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="8dp"
+    android:layout_marginEnd="24dp"
+    android:layout_marginStart="24dp"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/loginHeader"
+        android:text="Register"
+        android:layout_marginTop="@dimen/loginViewsMargin"/>
+        <EditText
+
+            android:id="@+id/editTextName"
+            style="@style/modifiedEditText"
+            android:hint="@string/login_name_hint"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:text="@={RejisterViewModel.userName}"
+            />
+
+    <EditText
+
+        android:id="@+id/editTextFamily"
+        style="@style/modifiedEditText"
+        android:hint="@string/family_hint"
+        android:inputType="textPersonName"
+        android:text="@={RejisterViewModel.userFamily}"
+        android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/editTextMobile"
+            style="@style/modifiedEditText"
+            android:hint="@string/login_mobile_number_hint"
+            android:inputType="phone"
+            android:text="@={RejisterViewModel.userPhone}"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            style="@style/modifiedEditText"
+            android:hint="@string/login_email_hint"
+            android:inputType="textEmailAddress"
+            android:text="@={RejisterViewModel.userEmail}"
+            android:maxLines="1"
+          />
+    // app:onFocusChange="@{RejisterViewModel.OnFocusChangeListener}" />
+
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            style="@style/modifiedEditText"
+            android:hint="@string/login_password_hint"
+            android:inputType="textPassword"
+            android:text="@={RejisterViewModel.userPassword}"
+            android:maxLines="1" />
+
+
+    <Button
+        android:id="@+id/cirLoginButton"
+        style="@style/loginButton"
+        android:layout_gravity="center_horizontal"
+        android:text="Signup"
+        android:onClick="@{(v) -> RejisterViewModel.onClick(v)}"
+        bind:toastMessage="@{RejisterViewModel.toastMessage}"
+        android:layout_marginTop="@dimen/loginViewsMargin"/>
+
+    <TextView
+        style="@style/parent"
+
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/primaryTextColor"
+        android:text="@string/login_signup_hint"
+        android:layout_marginTop="@dimen/loginViewsMargin"/>
+
+</LinearLayout>
+
+</layout>
