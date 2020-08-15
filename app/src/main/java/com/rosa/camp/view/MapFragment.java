@@ -4,18 +4,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
+import android.widget.Toast;
 
 
 import ir.map.sdk_map.maps.MapView;
 import ir.map.sdk_map.MapirStyle;
+import ir.map.servicesdk.MapService;
+import ir.map.servicesdk.ResponseListener;
+import ir.map.servicesdk.enums.RouteType;
+import ir.map.servicesdk.model.base.MapirError;
+import ir.map.servicesdk.request.RouteRequest;
+import ir.map.servicesdk.request.SearchRequest;
+import ir.map.servicesdk.response.AutoCompleteSearchResponse;
+import ir.map.servicesdk.response.RouteResponse;
 
+//import com.google.android.gms.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -32,6 +42,8 @@ public class MapFragment extends Fragment {
     MapboxMap map;
     Style mapStyle;
     MapView mapView;
+    SearchView searchView;
+    private MapService mapService = new MapService();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,8 +91,11 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_map, container, false);
-        mapView = view.findViewById(R.id.map_view);
-        mapView.onCreate(savedInstanceState);
+         mapView = view.findViewById(R.id.map_view);
+         mapView.onCreate(savedInstanceState);
+
+
+         //Installing Map
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
@@ -97,7 +112,53 @@ public class MapFragment extends Fragment {
         });
 
 
+        //Searching
+        searchView=view.findViewById(R.id.search);
+        CharSequence search;
+        search= searchView.getQuery();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب").build();
+                mapService.autoCompleteSearch(requestBody, new ResponseListener<AutoCompleteSearchResponse>() {
+                    @Override
+                    public void onSuccess(AutoCompleteSearchResponse response) {
+                        Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onError(MapirError error) {
+                        Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+
+        //Routing
+        RouteRequest requestBody = new RouteRequest.Builder(
+               35.740312,51.422625 ,35.722580,51.51678,
+
+                RouteType.DRIVING
+        ).build();
+        mapService.route(requestBody, new ResponseListener<RouteResponse>() {
+            @Override
+            public void onSuccess(RouteResponse response) {
+              //  Toast.makeText(MainActivity.this, "پاسخ مسیریابی دریافت شد", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"پاسخ مسیریابی دریافت شد!",Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onError(MapirError error) {
+              //  Toast.makeText(MainActivity.this, "مشکلی در مسیریابی پیش آمده", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"مشکلی در مسیریابی پیش آمده",Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         return view;

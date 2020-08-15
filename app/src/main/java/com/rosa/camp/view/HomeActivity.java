@@ -14,7 +14,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.rosa.camp.R;
 import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 
-import ir.map.sdk_map.maps.MapView;
+
 
 public class HomeActivity extends AppCompatActivity {
 

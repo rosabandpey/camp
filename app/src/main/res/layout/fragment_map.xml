@@ -15,6 +15,10 @@
         mapbox:mapbox_cameraZoomMax="20"
         mapbox:mapbox_cameraZoomMin="1" />
 
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search"
+        android:layout_width="259dp"
+        android:layout_height="wrap_content" />
 
 
 </FrameLayout>
