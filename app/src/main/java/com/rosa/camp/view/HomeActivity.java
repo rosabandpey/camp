@@ -1,6 +1,8 @@
 package com.rosa.camp.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.res.Resources;
@@ -11,9 +13,11 @@ import android.widget.TableLayout;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.tabs.TabLayout;
+import com.mapbox.android.core.permissions.PermissionsListener;
 import com.rosa.camp.R;
 import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 
+import java.util.List;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -21,6 +25,25 @@ public class HomeActivity extends AppCompatActivity {
     Toolbar mtoolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        List allFragments = getSupportFragmentManager().getFragments();
+        if (allFragments.isEmpty()) {
+            return;
+        }
+
+        Fragment currentFragment = (Fragment) allFragments.get(allFragments.size() - 1);
+        if (currentFragment instanceof PermissionsListener) {
+            currentFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            return;
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

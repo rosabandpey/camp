@@ -2,12 +2,18 @@ package com.rosa.camp.view;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,30 +33,49 @@ import ir.map.servicesdk.response.AutoCompleteSearchResponse;
 import ir.map.servicesdk.response.RouteResponse;
 
 //import com.google.android.gms.maps.MapView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.rosa.camp.R;
+import com.mapbox.android.core.location.LocationEngineCallback;
+import static android.os.Looper.getMainLooper;
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment  implements PermissionsListener {
 
 
     MapboxMap map;
     Style mapStyle;
     MapView mapView;
     SearchView searchView;
+    private LocationEngine locationEngine = null;
+    private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
+    private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
     public final static LatLng VANAK_SQUARE=new LatLng(35.7572,51.4099);
     private static final String MARKERS_SOURCE = "markers-source";
@@ -98,6 +123,91 @@ public class MapFragment extends Fragment {
 
     }
 
+    private void animateToCoordinate(LatLng coordinate) {
+        CameraPosition position = new CameraPosition.Builder()
+                .target(coordinate)
+                .zoom(16)
+                .build();
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    private void initializeLocationEngine() {
+        if (getActivity() == null) {
+            return;
+        }
+
+        locationEngine = LocationEngineProvider.getBestLocationEngine(getActivity());
+
+        long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
+        long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
+        LocationEngineRequest request = new LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
+
+        locationEngine.requestLocationUpdates(request, callback,android.os.Looper.getMainLooper());
+        locationEngine.getLastLocation(callback);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void toggleCurrentLocationButton() {
+        if (!map.getLocationComponent().isLocationComponentActivated() || !map.getLocationComponent().isLocationComponentEnabled()) {
+            return;
+        }
+        Location location = map.getLocationComponent().getLastKnownLocation();
+        if (location != null) {
+            animateToCoordinate(new LatLng(location.getLatitude(), location.getLongitude()));
+        }
+
+        switch (map.getLocationComponent().getRenderMode()) {
+            case RenderMode.NORMAL:
+                map.getLocationComponent().setRenderMode(RenderMode.COMPASS);
+                break;
+            case RenderMode.GPS:
+            case RenderMode.COMPASS:
+                map.getLocationComponent().setRenderMode(RenderMode.NORMAL);
+                break;
+        }
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+        if (getActivity() == null) {
+            return;
+        }
+        // Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+
+            LocationComponent locationComponent = map.getLocationComponent();
+
+            LocationComponentActivationOptions locationComponentActivationOptions =
+                    LocationComponentActivationOptions.builder(getActivity(), loadedMapStyle)
+                            .useDefaultLocationEngine(true)
+                            .build();
+
+            locationComponent.activateLocationComponent(locationComponentActivationOptions);
+            locationComponent.setLocationComponentEnabled(true);
+
+            initializeLocationEngine();
+        } else {
+            permissionsManager = new PermissionsManager((PermissionsListener) this);
+            permissionsManager.requestLocationPermissions(getActivity());
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void setupCurrentLocationButton() {
+        if (getView() == null) {
+            return;
+        }
+        FloatingActionButton fb = getView().findViewById(R.id.showCurrentLocationButton);
+        fb.setOnClickListener(v -> {
+            if (map.getStyle() != null) {
+                enableLocationComponent(map.getStyle());
+            }
+            toggleCurrentLocationButton();
+        });
+    }
 
 
     private void addMarkerToMapViewAtPosition(LatLng coordinate) {
@@ -105,8 +215,9 @@ public class MapFragment extends Fragment {
             Style style = map.getStyle();
 
             if (style.getImage(MARKER_ICON_ID) == null) {
-                style.addImage(MARKER_ICON_ID,
-                        BitmapFactory.decodeResource(
+              //  Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
+              //  Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+                style.addImage(MARKER_ICON_ID,BitmapFactory.decodeResource(
                                 getResources(), R.drawable.cedarmaps_marker_icon_default));
             }
 
@@ -157,6 +268,9 @@ public class MapFragment extends Fragment {
                         mapStyle = style;
                         // TODO;
                         addMarkerToMapViewAtPosition(VANAK_SQUARE);
+                        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+                            enableLocationComponent(style);
+                        }
                     }
 
 
@@ -174,9 +288,8 @@ public class MapFragment extends Fragment {
                     addMarkerToMapViewAtPosition(point);
                     return true;
 
-
-
                 });
+                setupCurrentLocationButton();
             }
 
         });
@@ -234,4 +347,119 @@ public class MapFragment extends Fragment {
         return view;
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            if (map.getStyle() != null) {
+                enableLocationComponent(map.getStyle());
+                toggleCurrentLocationButton();
+            }
+        } else {
+            Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private static class MapFragmentLocationCallback implements LocationEngineCallback<LocationEngineResult> {
+
+        private WeakReference<MapFragment> fragmentWeakReference;
+
+        MapFragmentLocationCallback(MapFragment fragment) {
+            fragmentWeakReference = new WeakReference<>(fragment);
+        }
+
+        /* The LocationEngineCallback interface's method which fires when the device's location has changed.
+         *
+         * @param result the LocationEngineResult object which has the last known location within it.
+         */
+        @Override
+        public void onSuccess(LocationEngineResult result) {
+            MapFragment fragment = fragmentWeakReference.get();
+
+            if (fragment != null) {
+                Location location = result.getLastLocation();
+
+                if (location == null) {
+                    return;
+                }
+
+                if (fragment.map != null && result.getLastLocation() != null) {
+                    fragment.map.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            String message = exception.getLocalizedMessage();
+            if (message != null) {
+                Log.d("LocationChange", message);
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    @SuppressWarnings({"MissingPermission"})
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (locationEngine != null) {
+            locationEngine.removeLocationUpdates(callback);
+        }
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mapView = null;
+    }
+
+
 }

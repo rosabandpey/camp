@@ -18,7 +18,20 @@
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"
         android:layout_width="259dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        mapbox:defaultQueryHint="Search Here"
+        />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/showCurrentLocationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        backgroundTint="@color/colorPrimary"
+        elevation="6dp"
+        pressedTranslationZ="12dp"
+        fabSize="normal"
+        srcCompat="@drawable/crosshairs_gps"
+        android:layout_margin="20dp"/>
 
 
 </FrameLayout>
