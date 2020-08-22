@@ -10,16 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import com.rosa.camp.R;
+import com.cedarstudios.cedarmapssdk.model.geocoder.forward.ForwardGeocode;
 
 import java.util.List;
 
-import ir.map.servicesdk.enums.SelectOptions;
-
 public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.SearchViewHolder> {
 
-    private List<String> mItems;
+    private List<ForwardGeocode> mItems;
 
     static class SearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -28,7 +25,7 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
         private TextView mCityTextView;
         private TextView mLocalityTextView;
 
-        private SelectOptions mItem;
+        private ForwardGeocode mItem;
 
         SearchViewHolder(View v) {
             super(v);
@@ -41,10 +38,10 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
             v.setOnClickListener(this);
         }
 
-        void bindData(@NonNull SelectOptions item) {
+        void bindData(@NonNull ForwardGeocode item) {
             mItem = item;
 
-            if (TextUtils.isEmpty(item.toString())) {
+            if (TextUtils.isEmpty(item.getName())) {
                 mNameTextView.setText("");
             } else {
                 mNameTextView.setText(item.getName());
