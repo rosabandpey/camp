@@ -1,5 +1,6 @@
 package com.rosa.camp.view;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -26,6 +27,7 @@ import ir.map.sdk_map.MapirStyle;
 import ir.map.servicesdk.MapService;
 import ir.map.servicesdk.ResponseListener;
 import ir.map.servicesdk.enums.RouteType;
+import ir.map.servicesdk.enums.SelectOptions;
 import ir.map.servicesdk.model.base.MapirError;
 import ir.map.servicesdk.request.RouteRequest;
 import ir.map.servicesdk.request.SearchRequest;
@@ -252,12 +254,20 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_map, container, false);
-         mapView = view.findViewById(R.id.map_view);
-         mapView.onCreate(savedInstanceState);
+        return inflater.inflate(R.layout.fragment_map, container, false);
+
+    }
 
 
-         //Installing Map
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mapView = view.findViewById(R.id.map_view);
+        mapView.onCreate(savedInstanceState);
+
+
+        //Installing Map
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
@@ -284,7 +294,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                                 .build());
 
                 //Set a touch event listener on the map
-                    map.addOnMapClickListener(point -> {
+                map.addOnMapClickListener(point -> {
                     addMarkerToMapViewAtPosition(point);
                     return true;
 
@@ -302,7 +312,12 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                SearchRequest requestBody = new SearchRequest.Builder("").build();
+                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب")
+                        .select(SelectOptions.POI)
+                        .select(SelectOptions.REGION)
+                        .select(SelectOptions.ROADS)
+                        .select(SelectOptions.PROVINCE)
+                        .build();
                 mapService.autoCompleteSearch(requestBody, new ResponseListener<AutoCompleteSearchResponse>() {
                     @Override
                     public void onSuccess(AutoCompleteSearchResponse response) {
@@ -326,25 +341,23 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
         //Routing
         RouteRequest requestBody = new RouteRequest.Builder(
-               35.740312,51.422625 ,35.722580,51.51678,
+                35.740312,51.422625 ,35.722580,51.51678,
 
                 RouteType.DRIVING
         ).build();
         mapService.route(requestBody, new ResponseListener<RouteResponse>() {
             @Override
             public void onSuccess(RouteResponse response) {
-              //  Toast.makeText(MainActivity.this, "پاسخ مسیریابی دریافت شد", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "پاسخ مسیریابی دریافت شد", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getActivity(),"پاسخ مسیریابی دریافت شد!",Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onError(MapirError error) {
-              //  Toast.makeText(MainActivity.this, "مشکلی در مسیریابی پیش آمده", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "مشکلی در مسیریابی پیش آمده", Toast.LENGTH_SHORT).show();
                 Toast.makeText(getActivity(),"مشکلی در مسیریابی پیش آمده",Toast.LENGTH_SHORT).show();
             }
         });
 
-
-        return view;
 
     }
 
