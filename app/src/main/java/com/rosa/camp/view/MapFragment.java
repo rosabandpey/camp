@@ -3,7 +3,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -35,6 +37,17 @@ import ir.map.servicesdk.response.AutoCompleteSearchResponse;
 import ir.map.servicesdk.response.RouteResponse;
 
 //import com.google.android.gms.maps.MapView;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -57,9 +70,16 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
+
 import com.rosa.camp.R;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import static android.os.Looper.getMainLooper;
+import static android.service.controls.ControlsProviderService.TAG;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -68,7 +88,7 @@ import java.util.List;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment  implements PermissionsListener {
+public class MapFragment extends Fragment  implements EasyPermissions.PermissionCallbacks {
 
 
     MapboxMap map;
@@ -83,6 +103,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     private static final String MARKERS_SOURCE = "markers-source";
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
+    private final int REQUEST_LOCATION_PERMISSION = 1;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -122,8 +143,50 @@ public class MapFragment extends Fragment  implements PermissionsListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
+        requestLocationPermission();
     }
+
+    private void displayLocationSettingsRequest(Context context) {
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
+                .addApi(LocationServices.API).build();
+        googleApiClient.connect();
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000 / 2);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        Log.i(TAG, "All location settings are satisfied.");
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
+
+                        try {
+                            // Show the dialog by calling startResolutionForResult(), and check the result
+                            // in onActivityResult().
+                            status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.i(TAG, "PendingIntent unable to execute request.");
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
+                        break;
+                }
+            }
+        });
+    }
+
 
     private void animateToCoordinate(LatLng coordinate) {
         CameraPosition position = new CameraPosition.Builder()
@@ -147,7 +210,8 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                 .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
                 .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
 
-        locationEngine.requestLocationUpdates(request, callback,android.os.Looper.getMainLooper());
+        locationEngine.requestLocationUpdates(request, callback, getMainLooper());
+      //  locationEngine.requestLocationUpdates(request, callback,android.os.Looper.getMainLooper());
         locationEngine.getLastLocation(callback);
     }
 
@@ -258,6 +322,27 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
     }
 
+    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+    public void requestLocationPermission() {
+        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+        String[] perms1 = {Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if(EasyPermissions.hasPermissions(getActivity(), perms) & (EasyPermissions.hasPermissions(getActivity(), perms1)) ) {
+            Toast.makeText(getActivity(), "Permission already granted", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -361,27 +446,26 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
     }
 
+
+
+
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
     }
 
     @Override
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
-    }
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
 
-    @Override
-    public void onPermissionResult(boolean granted) {
-        if (granted) {
-            if (map.getStyle() != null) {
-                enableLocationComponent(map.getStyle());
-                toggleCurrentLocationButton();
-            }
-        } else {
-            Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
+        // (Optional) Check whether the user denied any permissions and checked "NEVER ASK AGAIN."
+        // This will display a dialog directing them to enable the permission in app settings.
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
         }
     }
+
 
     private static class MapFragmentLocationCallback implements LocationEngineCallback<LocationEngineResult> {
 
@@ -401,9 +485,12 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
             if (fragment != null) {
                 Location location = result.getLastLocation();
+                Log.d("location","location is recieved");
 
                 if (location == null) {
+                    Log.d("location","location is null");
                     return;
+
                 }
 
                 if (fragment.map != null && result.getLastLocation() != null) {
