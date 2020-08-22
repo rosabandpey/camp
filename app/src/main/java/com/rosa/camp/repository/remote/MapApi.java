@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapApi {
 
     static Retrofit retrofit;
-    public final static  String URL="https://map.ir/search/";
+    public final static String URL="https://map.ir/search/";
 
     public static Retrofit getRetrofitMapInstance() {
 
