@@ -20,12 +20,11 @@ import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 import java.util.List;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity  {
 
     Toolbar mtoolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
-
 
 
     @Override
@@ -44,6 +43,8 @@ public class HomeActivity extends AppCompatActivity {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

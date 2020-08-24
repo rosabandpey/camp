@@ -10,12 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cedarstudios.cedarmapssdk.model.geocoder.forward.ForwardGeocode;
+
 
 import java.util.List;
 
-public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.SearchViewHolder> {
-
+public class SearchViewAdapter {
+/*
     private List<ForwardGeocode> mItems;
 
     static class SearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -124,5 +124,5 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
     @Override
     public int getItemCount() {
         return mItems.size();
-    }
+    } */
 }
