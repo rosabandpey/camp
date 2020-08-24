@@ -86,11 +86,11 @@ import java.util.List;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment   {
+public class MapFragment extends Fragment  implements PermissionsListener {
 
 
-    MapboxMap map;
-    Style mapStyle;
+    MapboxMap mapboxMap;
+    public Style mapStyle;
     MapView mapView;
     SearchView searchView;
     private LocationEngine locationEngine = null;
@@ -150,7 +150,7 @@ public class MapFragment extends Fragment   {
                 .target(coordinate)
                 .zoom(16)
                 .build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -174,21 +174,21 @@ public class MapFragment extends Fragment   {
 
     @SuppressLint("MissingPermission")
     private void toggleCurrentLocationButton() {
-        if (!map.getLocationComponent().isLocationComponentActivated() || !map.getLocationComponent().isLocationComponentEnabled()) {
+        if (!mapboxMap.getLocationComponent().isLocationComponentActivated() || !mapboxMap.getLocationComponent().isLocationComponentEnabled()) {
             return;
         }
-        Location location = map.getLocationComponent().getLastKnownLocation();
+        Location location = mapboxMap.getLocationComponent().getLastKnownLocation();
         if (location != null) {
             animateToCoordinate(new LatLng(location.getLatitude(), location.getLongitude()));
         }
 
-        switch (map.getLocationComponent().getRenderMode()) {
+        switch (mapboxMap.getLocationComponent().getRenderMode()) {
             case RenderMode.NORMAL:
-                map.getLocationComponent().setRenderMode(RenderMode.COMPASS);
+                mapboxMap.getLocationComponent().setRenderMode(RenderMode.COMPASS);
                 break;
             case RenderMode.GPS:
             case RenderMode.COMPASS:
-                map.getLocationComponent().setRenderMode(RenderMode.NORMAL);
+                mapboxMap.getLocationComponent().setRenderMode(RenderMode.NORMAL);
                 break;
         }
     }
@@ -198,10 +198,11 @@ public class MapFragment extends Fragment   {
         if (getActivity() == null) {
             return;
         }
-        // Check if permissions are enabled and if not request
-        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
 
-            LocationComponent locationComponent = map.getLocationComponent();
+        // Check if permissions are enabled and if not request
+       // if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
 
             LocationComponentActivationOptions locationComponentActivationOptions =
                     LocationComponentActivationOptions.builder(getActivity(), loadedMapStyle)
@@ -212,10 +213,10 @@ public class MapFragment extends Fragment   {
             locationComponent.setLocationComponentEnabled(true);
 
             initializeLocationEngine();
-        } else {
-            permissionsManager = new PermissionsManager((PermissionsListener) this);
-            permissionsManager.requestLocationPermissions(getActivity());
-        }
+     //   } else {
+       //     permissionsManager = new PermissionsManager((PermissionsListener) this);
+         //   permissionsManager.requestLocationPermissions(getActivity());
+      //  }
     }
 
     @SuppressLint("MissingPermission")
@@ -225,17 +226,18 @@ public class MapFragment extends Fragment   {
         }
         FloatingActionButton fb = getView().findViewById(R.id.showCurrentLocationButton);
         fb.setOnClickListener(v -> {
-            if (map.getStyle() != null) {
-                enableLocationComponent(map.getStyle());
+          if (mapboxMap.getStyle() != null) {
+               enableLocationComponent(mapboxMap.getStyle());
             }
+
             toggleCurrentLocationButton();
         });
     }
 
 
     private void addMarkerToMapViewAtPosition(LatLng coordinate) {
-        if (map != null && map.getStyle() != null) {
-            Style style = map.getStyle();
+        if (mapboxMap != null && mapboxMap.getStyle() != null) {
+            Style style = mapboxMap.getStyle();
 
             if (style.getImage(MARKER_ICON_ID) == null) {
               //  Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
@@ -279,11 +281,40 @@ public class MapFragment extends Fragment   {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        public void statusCheck() {
+        final LocationManager manager = (LocationManager)
+                getContext().getSystemService(Context.LOCATION_SERVICE);
 
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+
+        }
     }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -291,36 +322,42 @@ public class MapFragment extends Fragment   {
 
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-
+        statusCheck();
 
         //Installing Map
+
+
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                map = mapboxMap;
-                map.setStyle(new Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE), new Style.OnStyleLoaded() {
+            public void onMapReady(@NonNull MapboxMap mapboxMapinternal) {
+                mapboxMap = mapboxMapinternal;
+                Style.Builder style1;
+                mapboxMap.setStyle(new Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE), new Style.OnStyleLoaded() {
+
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         mapStyle = style;
                         // TODO;
+                        //Add marker to map
                         addMarkerToMapViewAtPosition(VANAK_SQUARE);
-                        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
-                            enableLocationComponent(style);
-                        }
+                        enableLocationComponent(style);
                     }
 
-
                 });
-                map.setMaxZoomPreference(18);
-                map.setMinZoomPreference(6);
-                map.setCameraPosition(
+             //   if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+
+           //     }
+                mapboxMap.setMaxZoomPreference(18);
+                mapboxMap.setMinZoomPreference(6);
+                mapboxMap.setCameraPosition(
                         new CameraPosition.Builder()
                                 .target(VANAK_SQUARE)
                                 .zoom(15)
                                 .build());
 
+
                 //Set a touch event listener on the map
-                map.addOnMapClickListener(point -> {
+                mapboxMap.addOnMapClickListener(point -> {
                     addMarkerToMapViewAtPosition(point);
                     return true;
 
@@ -387,6 +424,22 @@ public class MapFragment extends Fragment   {
 
     }
 
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            if (mapboxMap.getStyle() != null) {
+                enableLocationComponent(mapboxMap.getStyle());
+                toggleCurrentLocationButton();
+            }
+        } else {
+            Toast.makeText(getActivity(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     private static class MapFragmentLocationCallback implements LocationEngineCallback<LocationEngineResult> {
@@ -415,8 +468,8 @@ public class MapFragment extends Fragment   {
 
                 }
 
-                if (fragment.map != null && result.getLastLocation() != null) {
-                    fragment.map.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                if (fragment.mapboxMap != null && result.getLastLocation() != null) {
+                    fragment.mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
                 }
             }
         }
