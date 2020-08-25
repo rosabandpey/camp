@@ -15,12 +15,7 @@
         mapbox:mapbox_cameraZoomMax="20"
         mapbox:mapbox_cameraZoomMin="1" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search"
-        android:layout_width="259dp"
-        android:layout_height="wrap_content"
-        mapbox:defaultQueryHint="Search Here"
-        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/showCurrentLocationButton"
         android:layout_width="wrap_content"
@@ -50,5 +45,62 @@
         android:textSize="26sp"
         android:visibility="gone"
         android:gravity="center_horizontal" />
+
+
+    <TextView
+        android:id="@+id/search_view_list_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="textStart"
+        android:gravity="start"
+        android:textSize="15sp"
+        android:textColor="@android:color/black"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp" />
+    <TextView
+        android:id="@+id/search_view_list_item_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:textColor="@android:color/darker_gray"/>
+    <TextView
+        android:id="@+id/search_view_list_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:textColor="@android:color/black"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp" />
+
+    <TextView
+        android:id="@+id/search_view_list_item_locality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="textStart"
+        android:gravity="start"
+        android:textSize="15sp"
+        android:textColor="@android:color/black"/>
+
+    <EditText
+        android:id="@+id/searchtext"
+        android:layout_width="122dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/black"
+        android:textSize="15sp" />
+    <Button
+        android:id="@+id/searchbutton"
+        android:layout_width="122dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="250dp"
+        android:gravity="right"
+        android:text="search"
+        android:textColor="@android:color/black"
+        android:textSize="15sp" />
+
+
 
 </FrameLayout>

@@ -28,6 +28,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -45,6 +47,7 @@ import ir.map.servicesdk.request.SearchRequest;
 import ir.map.servicesdk.response.AutoCompleteSearchResponse;
 import ir.map.servicesdk.response.ReverseGeoCodeResponse;
 import ir.map.servicesdk.response.RouteResponse;
+import ir.map.servicesdk.response.SearchResponse;
 
 //import com.google.android.gms.maps.MapView;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -97,6 +100,8 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     public Style mapStyle;
     MapView mapView;
     SearchView searchView;
+    EditText searchText;
+    Button searchButton;
     private ProgressBar mProgressBar;
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
@@ -105,6 +110,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
     public final static LatLng VANAK_SQUARE=new LatLng(35.7572,51.4099);
+    public final static LatLng BAKU=new LatLng(51.4099,35.7572);
     private static final String MARKERS_SOURCE = "markers-source";
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
@@ -322,7 +328,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void reverseGeocode(final LatLng latLng1) {
+    private void reverseGeocode(LatLng latLng1) {
 
         if (TextUtils.isEmpty(mTextView.getText())) {
             mTextView.setVisibility(View.GONE);
@@ -332,8 +338,8 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         mProgressBar.setVisibility(View.VISIBLE);
 
 
-        mapService.reverseGeoCode(latLng1.getLongitude(),
-                latLng1.getLatitude()
+        mapService.reverseGeoCode(latLng1.getLatitude(),
+                latLng1.getLongitude()
 
                 ,new ResponseListener<ReverseGeoCodeResponse>() {
 
@@ -342,7 +348,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                         mProgressBar.setVisibility(View.GONE);
                         mTextView.setVisibility(View.VISIBLE);
 
-                        String address = result.getAddress();
+                        String address = result.getAddressCompact();
                         if (address != null) {
                             mTextView.setText(address);
                         } else {
@@ -397,19 +403,17 @@ public class MapFragment extends Fragment  implements PermissionsListener {
            //     }
                 mapboxMap.setMaxZoomPreference(18);
                 mapboxMap.setMinZoomPreference(6);
-                final LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
-                reverseGeocode(mapTargetLatLng);
-                mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition().target));
-
                 mapboxMap.setCameraPosition(
                         new CameraPosition.Builder()
                                 .target(VANAK_SQUARE)
                                 .zoom(15)
                                 .build());
 
+                //Set a location picker on listener of mapbox
+                LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
+                reverseGeocode(mapTargetLatLng);
+                mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition().target));
 
-
-               // mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition()));
 
 
                 //Set a touch event listener on the map
@@ -425,22 +429,53 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
 
         //Searching
-       /* searchView=view.findViewById(R.id.search);
-        CharSequence search;
-        search= searchView.getQuery();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+       //searchView=view.findViewById(R.id.search);
+        searchText=view.findViewById(R.id.searchtext);
+        searchButton=view.findViewById(R.id.searchbutton);
+        String search;
+        search= searchText.getText().toString();
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب").build();
+                mapService.search(requestBody, new ResponseListener<SearchResponse>() {
+                    @Override
+                    public void onSuccess(SearchResponse response) {
+                        Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
+                        addMarkerToMapViewAtPosition(BAKU);
+                        mapboxMap.setCameraPosition(
+                                new CameraPosition.Builder()
+                                        .target(BAKU)
+                                        .zoom(15)
+                                        .build());
+
+                    }
+                    @Override
+                    public void onError(MapirError error) {
+                        Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
+                        //addMarkerToMapViewAtPosition(BAKU);
+                    }
+                });
+            }
+        });
+
+      /*  searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب")
-                        .select(SelectOptions.POI)
-                        .select(SelectOptions.REGION)
-                        .select(SelectOptions.ROADS)
-                        .select(SelectOptions.PROVINCE)
-                        .build();
-                mapService.autoCompleteSearch(requestBody, new ResponseListener<AutoCompleteSearchResponse>() {
+
+                searchView.clearFocus();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                SearchRequest requestBody = new SearchRequest.Builder(newText).build();
+                mapService.search(requestBody, new ResponseListener<SearchResponse>() {
                     @Override
-                    public void onSuccess(AutoCompleteSearchResponse response) {
+                    public void onSuccess(SearchResponse response) {
                         Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
+                        addMarkerToMapViewAtPosition(BAKU);
                     }
                     @Override
                     public void onError(MapirError error) {
@@ -450,14 +485,9 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
                 return false;
             }
+        });  */
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });   */
-
-
+/*
         //Routing
         RouteRequest requestBody = new RouteRequest.Builder(
                 35.740312,51.422625 ,35.722580,51.51678,
@@ -476,7 +506,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                 Toast.makeText(getActivity(),"مشکلی در مسیریابی پیش آمده",Toast.LENGTH_SHORT).show();
             }
         });
-
+*/
 
     }
 
