@@ -322,7 +322,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void reverseGeocode(final Point point1) {
+    private void reverseGeocode(final LatLng latLng1) {
 
         if (TextUtils.isEmpty(mTextView.getText())) {
             mTextView.setVisibility(View.GONE);
@@ -332,8 +332,8 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         mProgressBar.setVisibility(View.VISIBLE);
 
 
-        mapService.reverseGeoCode(point1.longitude(),
-                point1.latitude()
+        mapService.reverseGeoCode(latLng1.getLongitude(),
+                latLng1.getLatitude()
 
                 ,new ResponseListener<ReverseGeoCodeResponse>() {
 
@@ -397,13 +397,16 @@ public class MapFragment extends Fragment  implements PermissionsListener {
            //     }
                 mapboxMap.setMaxZoomPreference(18);
                 mapboxMap.setMinZoomPreference(6);
+                final LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
+                reverseGeocode(mapTargetLatLng);
+                mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition().target));
+
                 mapboxMap.setCameraPosition(
                         new CameraPosition.Builder()
                                 .target(VANAK_SQUARE)
                                 .zoom(15)
                                 .build());
-                final LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
-                reverseGeocode(Point.fromLngLat(mapTargetLatLng.getLongitude(), mapTargetLatLng.getLatitude()));
+
 
 
                // mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition()));
@@ -422,7 +425,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
 
         //Searching
-        searchView=view.findViewById(R.id.search);
+       /* searchView=view.findViewById(R.id.search);
         CharSequence search;
         search= searchView.getQuery();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -452,7 +455,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
             public boolean onQueryTextChange(String newText) {
                 return false;
             }
-        });
+        });   */
 
 
         //Routing
