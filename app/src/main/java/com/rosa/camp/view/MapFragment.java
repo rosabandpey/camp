@@ -18,15 +18,18 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -40,6 +43,7 @@ import ir.map.servicesdk.model.base.MapirError;
 import ir.map.servicesdk.request.RouteRequest;
 import ir.map.servicesdk.request.SearchRequest;
 import ir.map.servicesdk.response.AutoCompleteSearchResponse;
+import ir.map.servicesdk.response.ReverseGeoCodeResponse;
 import ir.map.servicesdk.response.RouteResponse;
 
 //import com.google.android.gms.maps.MapView;
@@ -93,7 +97,10 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     public Style mapStyle;
     MapView mapView;
     SearchView searchView;
+    private ProgressBar mProgressBar;
+    private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
+    LatLng latLng;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
     private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
@@ -315,11 +322,52 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    private void reverseGeocode(final Point point1) {
+
+        if (TextUtils.isEmpty(mTextView.getText())) {
+            mTextView.setVisibility(View.GONE);
+        } else {
+            mTextView.setVisibility(View.VISIBLE);
+        }
+        mProgressBar.setVisibility(View.VISIBLE);
+
+
+        mapService.reverseGeoCode(point1.longitude(),
+                point1.latitude()
+
+                ,new ResponseListener<ReverseGeoCodeResponse>() {
+
+                    @Override
+                    public void onSuccess(ReverseGeoCodeResponse result) {
+                        mProgressBar.setVisibility(View.GONE);
+                        mTextView.setVisibility(View.VISIBLE);
+
+                        String address = result.getAddress();
+                        if (address != null) {
+                            mTextView.setText(address);
+                        } else {
+                            mTextView.setText("آدرسی یافت نشد");
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(MapirError error) {
+                        mProgressBar.setVisibility(View.GONE);
+                        mTextView.setVisibility(View.VISIBLE);
+
+                        mTextView.setText("خطا در پردازش");
+                    }
+
+                });
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        mTextView = view.findViewById(R.id.reverse_geocode_textView);
+        mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         statusCheck();
@@ -354,6 +402,11 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                                 .target(VANAK_SQUARE)
                                 .zoom(15)
                                 .build());
+                final LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
+                reverseGeocode(Point.fromLngLat(mapTargetLatLng.getLongitude(), mapTargetLatLng.getLatitude()));
+
+
+               // mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition()));
 
 
                 //Set a touch event listener on the map
