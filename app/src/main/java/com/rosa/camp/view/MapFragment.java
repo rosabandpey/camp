@@ -20,17 +20,26 @@ import android.os.Bundle;
 
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -75,13 +84,18 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager;
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
 import com.mapbox.android.core.location.LocationEngineCallback;
+import com.rosa.camp.ui.adapter.SearchViewAdapter;
+
 import static android.os.Looper.getMainLooper;
 import static android.service.controls.ControlsProviderService.TAG;
 
@@ -106,6 +120,12 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
     LatLng latLng;
+    private SearchView mSearchView;
+    private SearchViewAdapter mRecyclerAdapter;
+    private RecyclerView mRecyclerView;
+    private State state = State.MAP;
+    private CircleManager circleManager;
+    private LinearLayout mLinearLayout;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
     private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
@@ -128,7 +148,31 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     public MapFragment() {
         // Required empty public constructor
     }
-
+    private enum State {
+        MAP,
+        MAP_PIN,
+        SEARCHING,
+        RESULTS
+    }
+    private void setState(State state) {
+        this.state = state;
+        switch (state) {
+            case MAP:
+            case MAP_PIN:
+                mLinearLayout.setVisibility(View.GONE);
+                break;
+            case SEARCHING:
+                mLinearLayout.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.INVISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case RESULTS:
+                mLinearLayout.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.GONE);
+                break;
+        }
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -391,6 +435,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         mapStyle = style;
+                        circleManager = new CircleManager(mapView, mapboxMap, style);
                         // TODO;
                         //Add marker to map
                         addMarkerToMapViewAtPosition(VANAK_SQUARE);
@@ -429,15 +474,39 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
 
         //Searching
+
+        mRecyclerView = view.findViewById(R.id.recyclerView);
+        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
+        mProgressBar = view.findViewById(R.id.search_progress_bar);
+
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), mLinearLayoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(mDividerItemDecoration);
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP && state == State.MAP_PIN) {
+                setState(State.RESULTS);
+                return true;
+            }
+            return false;
+        });
+
+
        //searchView=view.findViewById(R.id.search);
-        searchText=view.findViewById(R.id.searchtext);
+      /*  searchText=view.findViewById(R.id.searchtext);
         searchButton=view.findViewById(R.id.searchbutton);
-        String search;
-        search= searchText.getText().toString();
+
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب").build();
+                String search;
+                search= searchText.getText().toString();
+                List <SearchResponse> mItem;
+                SearchRequest requestBody = new SearchRequest.Builder(search).build();
                 mapService.search(requestBody, new ResponseListener<SearchResponse>() {
                     @Override
                     public void onSuccess(SearchResponse response) {
@@ -457,7 +526,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                     }
                 });
             }
-        });
+        });  */
 
       /*  searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -509,6 +578,98 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 */
 
     }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.search_view_menu_item, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+
+        if (menu.findItem(R.id.action_search) == null) {
+            return;
+        }
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("جستجو در معابر");
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        mSearchView = searchView;
+
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && state == State.MAP_PIN) {
+                circleManager.deleteAll();
+                if (!TextUtils.isEmpty(searchView.getQuery())) {
+                    setState(State.RESULTS);
+                } else {
+                    setState(State.MAP);
+                }
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+
+                if (TextUtils.isEmpty(newText)) {
+                    circleManager.deleteAll();
+                    setState(State.MAP);
+                } else {
+                    setState(State.SEARCHING);
+
+                    SearchRequest requestBody = new SearchRequest.Builder(newText).build();
+                    mapService.search(requestBody, new ResponseListener<SearchResponse>() {
+                        @Override
+                        public void onSuccess(SearchResponse response) {
+                            Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
+                            setState(State.RESULTS);
+                            if (newText.equals(mSearchView.getQuery().toString())) {
+                                for (int i=0;i<response.getCount();i++) {
+                                    List<String> searchlist=null;
+                                    searchlist.add(response.getSearchItems().get(i).getAddress());
+
+                                    mRecyclerAdapter = new SearchViewAdapter(searchlist);
+                                }
+                                mRecyclerView.setAdapter(mRecyclerAdapter);
+                            }
+                        }
+                        @Override
+                        public void onError(MapirError error) {
+                            Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+                return false;
+            }
+        });
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_search) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showItemOnMap() {
+        setState(State.MAP_PIN);
+        addMarkerToMapViewAtPosition(BAKU);
+    }
+
+
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {

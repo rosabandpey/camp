@@ -46,42 +46,31 @@
         android:visibility="gone"
         android:gravity="center_horizontal" />
 
+    <LinearLayout
+        android:id="@+id/search_results_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        >
 
-    <TextView
-        android:id="@+id/search_view_list_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="textStart"
-        android:gravity="start"
-        android:textSize="15sp"
-        android:textColor="@android:color/black"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp" />
-    <TextView
-        android:id="@+id/search_view_list_item_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:maxLines="1"
-        android:textColor="@android:color/darker_gray"/>
-    <TextView
-        android:id="@+id/search_view_list_city"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:maxLines="1"
-        android:textColor="@android:color/black"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp" />
+        <ProgressBar
+            android:id="@+id/search_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:visibility="gone"/>
 
-    <TextView
-        android:id="@+id/search_view_list_item_locality"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="textStart"
-        android:gravity="start"
-        android:textSize="15sp"
-        android:textColor="@android:color/black"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:id="@+id/recyclerView"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/searchtext"
