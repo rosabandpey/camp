@@ -37,8 +37,6 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
 
         void bindData(@NonNull SearchItem item) {
 
-
-
                 mItem = item;
 
                 if (TextUtils.isEmpty(item.getAddress())) {
@@ -46,8 +44,6 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
                 } else {
                     mNameTextView.setText(item.getAddress());
                 }
-
-
 
         }
 
