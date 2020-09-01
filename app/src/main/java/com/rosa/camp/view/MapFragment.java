@@ -335,6 +335,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_map, container, false);
 
     }
@@ -581,11 +582,10 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
     }
 
+
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.search_view_menu_item, menu);
-
         super.onCreateOptionsMenu(menu, inflater);
     }
 
