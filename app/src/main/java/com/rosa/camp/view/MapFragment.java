@@ -432,12 +432,14 @@ public class MapFragment extends Fragment  implements PermissionsListener {
        //searchView=view.findViewById(R.id.search);
         searchText=view.findViewById(R.id.searchtext);
         searchButton=view.findViewById(R.id.searchbutton);
-        String search;
-        search= searchText.getText().toString();
+
+
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SearchRequest requestBody = new SearchRequest.Builder("خیابان انقلاب").build();
+                String search;
+                search= searchText.getText().toString();
+                SearchRequest requestBody = new SearchRequest.Builder(search).build();
                 mapService.search(requestBody, new ResponseListener<SearchResponse>() {
                     @Override
                     public void onSuccess(SearchResponse response) {
