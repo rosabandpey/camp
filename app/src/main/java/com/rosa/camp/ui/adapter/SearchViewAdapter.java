@@ -16,16 +16,17 @@ import com.rosa.camp.view.MapFragment;
 
 import java.util.List;
 
+import ir.map.servicesdk.model.inner.SearchItem;
 import ir.map.servicesdk.response.SearchResponse;
 
 public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.SearchViewHolder> {
 
-    private SearchResponse mItems;
+    private List<SearchItem> mItems;
 
     static class SearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mNameTextView;
-        private SearchResponse mItem;
+        private SearchItem mItem;
 
         SearchViewHolder(View v) {
             super(v);
@@ -34,18 +35,18 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
             v.setOnClickListener(this);
         }
 
-        void bindData(@NonNull SearchResponse item) {
+        void bindData(@NonNull SearchItem item) {
 
-            for (int i = 0; i < item.getCount(); i++) {
+
 
                 mItem = item;
 
-                if (TextUtils.isEmpty(item.getSearchItems().get(i).getAddress())) {
+                if (TextUtils.isEmpty(item.getAddress())) {
                     mNameTextView.setText("");
                 } else {
-                    mNameTextView.setText(item.getSearchItems().get(i).getAddress());
+                    mNameTextView.setText(item.getAddress());
                 }
-            }
+
 
 
         }
@@ -62,25 +63,25 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
         }
     }
 
-    public SearchViewAdapter(SearchResponse items) {
+    public SearchViewAdapter(List<SearchItem> items) {
         mItems = items;
     }
 
     @NonNull
     @Override
     public SearchViewAdapter.SearchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_map, parent, false);
+        View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_search_autocomplete_item, parent, false);
         return new SearchViewHolder(inflatedView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewAdapter.SearchViewHolder holder, int position) {
-        SearchResponse item = mItems.getSearchItems().get(position);
+        SearchItem item = mItems.get(position);
         holder.bindData(item);
     }
 
     @Override
     public int getItemCount() {
-        return mItems.getCount();
+        return mItems.size();
     }
 }

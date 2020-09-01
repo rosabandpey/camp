@@ -51,6 +51,7 @@ import ir.map.servicesdk.ResponseListener;
 import ir.map.servicesdk.enums.RouteType;
 import ir.map.servicesdk.enums.SelectOptions;
 import ir.map.servicesdk.model.base.MapirError;
+import ir.map.servicesdk.model.inner.SearchItem;
 import ir.map.servicesdk.request.RouteRequest;
 import ir.map.servicesdk.request.SearchRequest;
 import ir.map.servicesdk.response.AutoCompleteSearchResponse;
@@ -420,6 +421,9 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
+        mRecyclerView = view.findViewById(R.id.recyclerView);
+        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
+        mProgressBar = view.findViewById(R.id.search_progress_bar);
         statusCheck();
 
         //Installing Map
@@ -475,9 +479,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
         //Searching
 
-        mRecyclerView = view.findViewById(R.id.recyclerView);
-        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
-        mProgressBar = view.findViewById(R.id.search_progress_bar);
+
 
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -631,14 +633,14 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                         public void onSuccess(SearchResponse response) {
                             Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
                             setState(State.RESULTS);
-                            if (newText.equals(mSearchView.getQuery().toString())) {
-                                for (int i=0;i<response.getCount();i++) {
-                                    List<String> searchlist=null;
-                                    searchlist.add(response.getSearchItems().get(i).getAddress());
+                            if (response.getCount() > 0 && newText.equals(mSearchView.getQuery().toString())) {
 
-                                    mRecyclerAdapter = new SearchViewAdapter(searchlist);
-                                }
-                                mRecyclerView.setAdapter(mRecyclerAdapter);
+                                    //List<SearchItem> searchlist=response.getSearchItems();
+                                    //searchlist.add(response.getSearchItems().get(i).getAddress());
+
+                                    mRecyclerAdapter = new SearchViewAdapter(response.getSearchItems());
+
+                                    mRecyclerView.setAdapter(mRecyclerAdapter);
                             }
                         }
                         @Override
