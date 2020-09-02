@@ -1,6 +1,7 @@
 package com.rosa.camp.ui.adapter;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,11 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
             Fragment fragment = homeActivity.getSupportFragmentManager().findFragmentById(R.id.content);
             if (fragment instanceof MapFragment) {
                 MapFragment fgf = (MapFragment)fragment;
-                fgf.showItemOnMap();
+
+                fgf.showItemOnMap(mItem);
+            }
+            else {
+                Log.d("frag","no fragment");
             }
         }
     }
