@@ -114,7 +114,6 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     MapboxMap mapboxMap;
     public Style mapStyle;
     MapView mapView;
-    SearchView searchView;
     EditText searchText;
     Button searchButton;
     private ProgressBar mProgressBar;
@@ -422,9 +421,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-        mRecyclerView = view.findViewById(R.id.recyclerView);
-        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
-        mProgressBar = view.findViewById(R.id.search_progress_bar);
+
         statusCheck();
 
         //Installing Map
@@ -479,8 +476,9 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
 
         //Searching
-
-
+        mRecyclerView = view.findViewById(R.id.recyclerView);
+        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
+        mProgressBar = view.findViewById(R.id.search_progress_bar);
 
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -666,9 +664,42 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showItemOnMap() {
+    public void showItemOnMap(final SearchItem item) {
+        Log.d("onclick","view clicked");
         setState(State.MAP_PIN);
-        addMarkerToMapViewAtPosition(BAKU);
+        if (getActivity() == null || item.getGeom().getCoordinates() == null) {
+            return;
+        }
+
+        circleManager.deleteAll();
+        mSearchView.clearFocus();
+
+        int color = ContextCompat.getColor(getActivity(), R.color.colorPrimary);
+        int strokeColor = ContextCompat.getColor(getActivity(), R.color.colorAccent);
+        double longitude = item.getGeom().getLongitude();
+        double latitude = item.getGeom().getLatitude();
+        LatLng latLng2=new LatLng(latitude,longitude);
+        CircleOptions circleOptions = new CircleOptions()
+
+                .withLatLng(latLng2)
+                .withCircleColor(ColorUtils.colorToRgbaString(color))
+                .withCircleStrokeWidth(4f)
+                .withCircleStrokeColor(ColorUtils.colorToRgbaString(strokeColor))
+                .withCircleBlur(0.5f)
+                .withCircleRadius(12f);
+        circleManager.create(circleOptions);
+
+        circleManager.addClickListener(circle -> {
+            if (!TextUtils.isEmpty(item.getAddress())) {
+                Toast.makeText(getContext(), item.getAddress(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), item.getAddress(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (item.getGeom() != null) {
+            mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(latLng2), 1000);
+        }
     }
 
 
