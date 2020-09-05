@@ -117,6 +117,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     EditText searchText;
     Button searchButton;
     private ProgressBar mProgressBar;
+    private ProgressBar sProgressBar;
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
     LatLng latLng;
@@ -164,12 +165,12 @@ public class MapFragment extends Fragment  implements PermissionsListener {
             case SEARCHING:
                 mLinearLayout.setVisibility(View.VISIBLE);
                 mRecyclerView.setVisibility(View.INVISIBLE);
-                mProgressBar.setVisibility(View.VISIBLE);
+                sProgressBar.setVisibility(View.VISIBLE);
                 break;
             case RESULTS:
                 mLinearLayout.setVisibility(View.VISIBLE);
                 mRecyclerView.setVisibility(View.VISIBLE);
-                mProgressBar.setVisibility(View.GONE);
+                sProgressBar.setVisibility(View.GONE);
                 break;
         }
     }
@@ -419,6 +420,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         super.onViewCreated(view, savedInstanceState);
         mTextView = view.findViewById(R.id.reverse_geocode_textView);
         mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
+        sProgressBar = view.findViewById(R.id.search_progress_bar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
 
@@ -458,6 +460,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
 
                 //Set a location picker on listener of mapbox
                 LatLng mapTargetLatLng = mapboxMap.getCameraPosition().target;
+
                 reverseGeocode(mapTargetLatLng);
                 mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition().target));
 
@@ -478,7 +481,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
         //Searching
         mRecyclerView = view.findViewById(R.id.recyclerView);
         mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
-        mProgressBar = view.findViewById(R.id.search_progress_bar);
+        mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
 
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -495,67 +498,6 @@ public class MapFragment extends Fragment  implements PermissionsListener {
             }
             return false;
         });
-
-
-       //searchView=view.findViewById(R.id.search);
-      /*  searchText=view.findViewById(R.id.searchtext);
-        searchButton=view.findViewById(R.id.searchbutton);
-
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String search;
-                search= searchText.getText().toString();
-                List <SearchResponse> mItem;
-                SearchRequest requestBody = new SearchRequest.Builder(search).build();
-                mapService.search(requestBody, new ResponseListener<SearchResponse>() {
-                    @Override
-                    public void onSuccess(SearchResponse response) {
-                        Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
-                        addMarkerToMapViewAtPosition(BAKU);
-                        mapboxMap.setCameraPosition(
-                                new CameraPosition.Builder()
-                                        .target(BAKU)
-                                        .zoom(15)
-                                        .build());
-
-                    }
-                    @Override
-                    public void onError(MapirError error) {
-                        Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
-                        //addMarkerToMapViewAtPosition(BAKU);
-                    }
-                });
-            }
-        });  */
-
-      /*  searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                searchView.clearFocus();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-
-                SearchRequest requestBody = new SearchRequest.Builder(newText).build();
-                mapService.search(requestBody, new ResponseListener<SearchResponse>() {
-                    @Override
-                    public void onSuccess(SearchResponse response) {
-                        Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
-                        addMarkerToMapViewAtPosition(BAKU);
-                    }
-                    @Override
-                    public void onError(MapirError error) {
-                        Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                return false;
-            }
-        });  */
 
 /*
         //Routing
@@ -624,8 +566,18 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                     setState(State.MAP);
                 } else {
                     setState(State.SEARCHING);
+                    LatLng mapTargetLat=mapboxMap.getCameraPosition().target;
+                    SearchRequest requestBody = new SearchRequest.Builder(newText)
 
-                    SearchRequest requestBody = new SearchRequest.Builder(newText).build();
+                            .select(SelectOptions.POI)
+                            .select(SelectOptions.REGION)
+                            .select(SelectOptions.ROADS)
+                            .select(SelectOptions.NEARBY).location(mapTargetLat.getLatitude(),mapTargetLat.getLongitude())
+                            .select(SelectOptions.CITY)
+                            .select(SelectOptions.COUNTY)
+                            .select(SelectOptions.WOOD_WATER)
+                            .build();
+
                     mapService.search(requestBody, new ResponseListener<SearchResponse>() {
                         @Override
                         public void onSuccess(SearchResponse response) {
@@ -633,11 +585,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
                             setState(State.RESULTS);
                             if (response.getCount() > 0 && newText.equals(mSearchView.getQuery().toString())) {
 
-                                    //List<SearchItem> searchlist=response.getSearchItems();
-                                    //searchlist.add(response.getSearchItems().get(i).getAddress());
-
                                     mRecyclerAdapter = new SearchViewAdapter(response.getSearchItems());
-
                                     mRecyclerView.setAdapter(mRecyclerAdapter);
                             }
                         }

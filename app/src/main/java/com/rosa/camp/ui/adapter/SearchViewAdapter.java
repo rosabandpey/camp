@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rosa.camp.R;
 import com.rosa.camp.view.HomeActivity;
+import com.rosa.camp.view.LoginFragment;
 import com.rosa.camp.view.MapFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ir.map.servicesdk.model.inner.SearchItem;
@@ -24,15 +26,24 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
 
     private List<SearchItem> mItems;
 
+
+
     static class SearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mNameTextView;
+        private TextView mTypeTextView;
+        private TextView mCityTextView;
+        private TextView mDistrictTextView;
         private SearchItem mItem;
+
 
         SearchViewHolder(View v) {
             super(v);
 
             mNameTextView = v.findViewById(R.id.search_view_list_item_name);
+           // mTypeTextView = v.findViewById(R.id.search_view_list_item_type);
+            mCityTextView = v.findViewById(R.id.search_view_list_city);
+            mDistrictTextView = v.findViewById(R.id.search_view_list_item_district);
             v.setOnClickListener(this);
         }
 
@@ -46,21 +57,77 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
                     mNameTextView.setText(item.getAddress());
                 }
 
+
+
+
+
+            String city = null;
+            if (item.getCity() != null) {
+                city = item.getCity();
+                if (TextUtils.isEmpty(city)) {
+                    mCityTextView.setText("");
+                    mCityTextView.setVisibility(View.GONE);
+                } else {
+                    mCityTextView.setText(city);
+                    mCityTextView.setVisibility(View.VISIBLE);
+                }
+            } else {
+                mCityTextView.setText("");
+                mCityTextView.setVisibility(View.GONE);
+            }
+
+
+
+            StringBuilder district = null;
+            if (item.getDistrict() != null && item.getDistrict() != null) {
+
+                    String l = item.getDistrict();
+                    if (district == null) {
+                        district = new StringBuilder(l);
+                    } else {
+                        district.append("، ").append(l);
+                    }
+                }
+                if (TextUtils.isEmpty(district != null ? district.toString() : null)) {
+                mDistrictTextView.setText("");
+                    mDistrictTextView.setVisibility(View.GONE);
+            } else {
+                    mDistrictTextView.setText(district.toString());
+                    mDistrictTextView.setVisibility(View.VISIBLE);
+                if (mCityTextView.getText().length() != 0) {
+                    String result = city != null ? city + "،" : "";
+                    mCityTextView.setText(result);
+                }
+            }
+
+
+
         }
 
 
         @Override
         public void onClick(View v) {
-            HomeActivity homeActivity = (HomeActivity) v.getContext();
-            Fragment fragment = homeActivity.getSupportFragmentManager().findFragmentById(R.id.content);
-            if (fragment instanceof MapFragment) {
-                MapFragment fgf = (MapFragment)fragment;
 
-                fgf.showItemOnMap(mItem);
-            }
-            else {
-                Log.d("frag","no fragment");
-            }
+                HomeActivity homeActivity = (HomeActivity) v.getContext();
+                List<Fragment> fragments = homeActivity.getSupportFragmentManager().getFragments();
+                ArrayList<Fragment> visibleFragments = new ArrayList<>();
+                if (fragments != null) {
+                    for (Fragment fragment : fragments) {
+                        if (fragment != null && fragment.isVisible())
+                            visibleFragments.add(fragment);
+                        if (fragment instanceof MapFragment) {
+                            MapFragment fgf = (MapFragment)fragment;
+
+                            fgf.showItemOnMap(mItem);
+                        }
+                        else {
+
+                            Log.d("frag","no frag");
+                        }
+                    }
+                }
+
+           // Fragment fragment = homeActivity.getSupportFragmentManager().findFragmentById(R.id.content);
         }
     }
 
