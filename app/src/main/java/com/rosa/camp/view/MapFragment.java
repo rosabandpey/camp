@@ -499,26 +499,7 @@ public class MapFragment extends Fragment  implements PermissionsListener {
             return false;
         });
 
-/*
-        //Routing
-        RouteRequest requestBody = new RouteRequest.Builder(
-                35.740312,51.422625 ,35.722580,51.51678,
 
-                RouteType.DRIVING
-        ).build();
-        mapService.route(requestBody, new ResponseListener<RouteResponse>() {
-            @Override
-            public void onSuccess(RouteResponse response) {
-                //  Toast.makeText(MainActivity.this, "پاسخ مسیریابی دریافت شد", Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(),"پاسخ مسیریابی دریافت شد!",Toast.LENGTH_SHORT).show();
-            }
-            @Override
-            public void onError(MapirError error) {
-                //  Toast.makeText(MainActivity.this, "مشکلی در مسیریابی پیش آمده", Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(),"مشکلی در مسیریابی پیش آمده",Toast.LENGTH_SHORT).show();
-            }
-        });
-*/
 
     }
 
