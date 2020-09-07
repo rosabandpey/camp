@@ -4,12 +4,21 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -17,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.geojson.LineString;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -26,6 +36,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager;
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions;
 import com.mapbox.mapboxsdk.plugins.annotation.LineManager;
 import com.mapbox.mapboxsdk.plugins.annotation.LineOptions;
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
@@ -33,6 +44,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
+import com.rosa.camp.ui.adapter.SearchViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -42,10 +54,14 @@ import ir.map.sdk_map.maps.MapView;
 import ir.map.servicesdk.MapService;
 import ir.map.servicesdk.ResponseListener;
 import ir.map.servicesdk.enums.RouteType;
+import ir.map.servicesdk.enums.SelectOptions;
 import ir.map.servicesdk.model.base.MapirError;
 import ir.map.servicesdk.model.inner.RouteItem;
+import ir.map.servicesdk.model.inner.SearchItem;
 import ir.map.servicesdk.request.RouteRequest;
+import ir.map.servicesdk.request.SearchRequest;
 import ir.map.servicesdk.response.RouteResponse;
+import ir.map.servicesdk.response.SearchResponse;
 import okhttp3.Route;
 
 /**
@@ -65,6 +81,15 @@ public class DirectionFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView hintTextView;
     private TextView distanceTextView;
+    private ProgressBar sProgressBar;
+    private AppCompatTextView mTextView;
+    private LocationEngine locationEngine = null;
+    private SearchView mSearchView;
+    private SearchViewAdapter mRecyclerAdapter;
+    private RecyclerView mRecyclerView;
+    private DirectionFragment.State state = DirectionFragment.State.MAP;
+    private CircleManager circleManager;
+    private LinearLayout mLinearLayout;
     private SymbolManager symbolManager;
     private LineManager lineManager;
     private MapService mapService = new MapService();
@@ -84,7 +109,31 @@ public class DirectionFragment extends Fragment {
     public DirectionFragment() {
         // Required empty public constructor
     }
-
+    private enum State {
+        MAP,
+        MAP_PIN,
+        SEARCHING,
+        RESULTS
+    }
+    private void setState(DirectionFragment.State state) {
+        this.state = state;
+        switch (state) {
+            case MAP:
+            case MAP_PIN:
+                mLinearLayout.setVisibility(View.GONE);
+                break;
+            case SEARCHING:
+                mLinearLayout.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.INVISIBLE);
+                sProgressBar.setVisibility(View.VISIBLE);
+                break;
+            case RESULTS:
+                mLinearLayout.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                sProgressBar.setVisibility(View.GONE);
+                break;
+        }
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -131,7 +180,7 @@ public class DirectionFragment extends Fragment {
         progressBar = view.findViewById(R.id.direction_progress_bar);
         hintTextView = view.findViewById(R.id.direction_hint_text_view);
         distanceTextView = view.findViewById(R.id.direction_distance_text_view);
-
+        sProgressBar = view.findViewById(R.id.search_progress_bar);
         view.findViewById(R.id.direction_reset_button).setOnClickListener(v -> resetToInitialState());
 
         mMapView.onCreate(savedInstanceState);
@@ -146,6 +195,7 @@ public class DirectionFragment extends Fragment {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         mapStyle = style;
+                        circleManager = new CircleManager(mMapView, mMapboxMap, style);
                         style.addImage(DEPARTURE_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_start)));
                         style.addImage(DESTINATION_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_end)));
                         symbolManager = new SymbolManager(mMapView, mMapboxMap, style);
@@ -174,6 +224,26 @@ public class DirectionFragment extends Fragment {
 
         });
 
+        //Searching
+        mRecyclerView = view.findViewById(R.id.recyclerView);
+        mLinearLayout = view.findViewById(R.id.search_results_linear_layout);
+
+
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), mLinearLayoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(mDividerItemDecoration);
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP && state == DirectionFragment.State.MAP_PIN) {
+                setState(DirectionFragment.State.RESULTS);
+                return true;
+            }
+            return false;
+        });
 
     }
 
@@ -205,7 +275,6 @@ public class DirectionFragment extends Fragment {
                     return;
                 }
                 String geometry=route.getGeometry();
-
                 drawCoordinatesInBound(geometry);
 
                 hintLayout.setVisibility(View.GONE);
@@ -261,6 +330,136 @@ public class DirectionFragment extends Fragment {
         }
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.search_view_menu_item, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+
+        if (menu.findItem(R.id.action_search) == null) {
+            return;
+        }
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("جستجو در معابر");
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        mSearchView = searchView;
+
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && state == DirectionFragment.State.MAP_PIN) {
+                circleManager.deleteAll();
+                if (!TextUtils.isEmpty(searchView.getQuery())) {
+                    setState(DirectionFragment.State.RESULTS);
+                } else {
+                    setState(DirectionFragment.State.MAP);
+                }
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+
+                if (TextUtils.isEmpty(newText)) {
+                    circleManager.deleteAll();
+                    setState(DirectionFragment.State.MAP);
+                } else {
+                    setState(DirectionFragment.State.SEARCHING);
+                    LatLng mapTargetLat=mMapboxMap.getCameraPosition().target;
+                    SearchRequest requestBody = new SearchRequest.Builder(newText)
+
+                            .select(SelectOptions.POI)
+                            .select(SelectOptions.REGION)
+                            .select(SelectOptions.ROADS)
+                            .select(SelectOptions.NEARBY).location(mapTargetLat.getLatitude(),mapTargetLat.getLongitude())
+                            .select(SelectOptions.CITY)
+                            .select(SelectOptions.COUNTY)
+                            .select(SelectOptions.WOOD_WATER)
+                            .build();
+
+                    mapService.search(requestBody, new ResponseListener<SearchResponse>() {
+                        @Override
+                        public void onSuccess(SearchResponse response) {
+                            Toast.makeText(getActivity(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
+                            setState(DirectionFragment.State.RESULTS);
+                            if (response.getCount() > 0 && newText.equals(mSearchView.getQuery().toString())) {
+
+                                mRecyclerAdapter = new SearchViewAdapter(response.getSearchItems());
+                                mRecyclerView.setAdapter(mRecyclerAdapter);
+                            }
+                        }
+                        @Override
+                        public void onError(MapirError error) {
+                            Toast.makeText(getActivity(), "مشکلی در جستجو پیش آمده", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+                return false;
+            }
+        });
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_search) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showItemOnMap(final SearchItem item) {
+        Log.d("onclick","view clicked");
+        setState(DirectionFragment.State.MAP_PIN);
+        if (getActivity() == null || item.getGeom().getCoordinates() == null) {
+            return;
+        }
+
+        circleManager.deleteAll();
+        mSearchView.clearFocus();
+
+        int color = ContextCompat.getColor(getActivity(), R.color.colorPrimary);
+        int strokeColor = ContextCompat.getColor(getActivity(), R.color.colorAccent);
+        double longitude = item.getGeom().getLongitude();
+        double latitude = item.getGeom().getLatitude();
+        LatLng latLng2=new LatLng(latitude,longitude);
+        CircleOptions circleOptions = new CircleOptions()
+
+                .withLatLng(latLng2)
+                .withCircleColor(ColorUtils.colorToRgbaString(color))
+                .withCircleStrokeWidth(4f)
+                .withCircleStrokeColor(ColorUtils.colorToRgbaString(strokeColor))
+                .withCircleBlur(0.5f)
+                .withCircleRadius(12f);
+        circleManager.create(circleOptions);
+
+        circleManager.addClickListener(circle -> {
+            if (!TextUtils.isEmpty(item.getAddress())) {
+                Toast.makeText(getContext(), item.getAddress(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), item.getAddress(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (item.getGeom() != null) {
+            mMapboxMap.easeCamera(CameraUpdateFactory.newLatLng(latLng2), 1000);
+        }
+    }
+
+
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -314,9 +513,5 @@ public class DirectionFragment extends Fragment {
         mMapView = null;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-    }
+
 }

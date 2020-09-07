@@ -16,6 +16,33 @@
         mapbox:mapbox_cameraTargetLng="51.4099"
         />
 
+
+    <LinearLayout
+        android:id="@+id/search_results_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        >
+
+        <ProgressBar
+            android:id="@+id/search_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:id="@+id/recyclerView"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/direction_hint_layout"
         android:layout_width="match_parent"

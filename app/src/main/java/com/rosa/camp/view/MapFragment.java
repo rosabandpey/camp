@@ -114,13 +114,10 @@ public class MapFragment extends Fragment  implements PermissionsListener {
     MapboxMap mapboxMap;
     public Style mapStyle;
     MapView mapView;
-    EditText searchText;
-    Button searchButton;
     private ProgressBar mProgressBar;
     private ProgressBar sProgressBar;
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
-    LatLng latLng;
     private SearchView mSearchView;
     private SearchViewAdapter mRecyclerAdapter;
     private RecyclerView mRecyclerView;

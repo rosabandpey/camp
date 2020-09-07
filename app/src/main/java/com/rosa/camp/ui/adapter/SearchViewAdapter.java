@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rosa.camp.R;
+import com.rosa.camp.view.DirectionFragment;
 import com.rosa.camp.view.HomeActivity;
 import com.rosa.camp.view.LoginFragment;
 import com.rosa.camp.view.MapFragment;
@@ -115,8 +116,18 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
                     for (Fragment fragment : fragments) {
                         if (fragment != null && fragment.isVisible())
                             visibleFragments.add(fragment);
-                        if (fragment instanceof MapFragment) {
+                        if (fragment instanceof MapFragment ) {
                             MapFragment fgf = (MapFragment)fragment;
+
+                            fgf.showItemOnMap(mItem);
+                        }
+                        else {
+
+                            Log.d("frag","no frag");
+                        }
+
+                        if (fragment instanceof DirectionFragment ) {
+                            DirectionFragment fgf = (DirectionFragment)fragment;
 
                             fgf.showItemOnMap(mItem);
                         }
