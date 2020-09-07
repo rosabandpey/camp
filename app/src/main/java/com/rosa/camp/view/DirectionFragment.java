@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mapbox.geojson.LineString;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -34,6 +35,7 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import ir.map.sdk_map.MapirStyle;
 import ir.map.sdk_map.maps.MapView;
@@ -41,6 +43,7 @@ import ir.map.servicesdk.MapService;
 import ir.map.servicesdk.ResponseListener;
 import ir.map.servicesdk.enums.RouteType;
 import ir.map.servicesdk.model.base.MapirError;
+import ir.map.servicesdk.model.inner.RouteItem;
 import ir.map.servicesdk.request.RouteRequest;
 import ir.map.servicesdk.response.RouteResponse;
 import okhttp3.Route;
@@ -143,8 +146,8 @@ public class DirectionFragment extends Fragment {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         mapStyle = style;
-                        style.addImage(DEPARTURE_IMAGE, ContextCompat.getDrawable(getContext(), R.drawable.cedarmaps_marker_icon_start));
-                        style.addImage(DESTINATION_IMAGE, ContextCompat.getDrawable(getContext(), R.drawable.cedarmaps_marker_icon_end));
+                        style.addImage(DEPARTURE_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_start)));
+                        style.addImage(DESTINATION_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_end)));
                         symbolManager = new SymbolManager(mMapView, mMapboxMap, style);
 
                         lineManager = new LineManager(mMapView, mMapboxMap, style);
@@ -194,30 +197,19 @@ public class DirectionFragment extends Fragment {
                 if (response.getRoutes() == null) {
                     return;
                 }
-                Route route = response.getRoutes().get(0);
-                Double distance = route.getDistance();
-                if (distance == null) {
+                RouteItem route = response.getRoutes().get(0);
+
+
+
+                if (route.getGeometry() == null ) {
                     return;
                 }
-                if (distance > 1000) {
-                    distance = distance / 1000.0;
-                    distance = (double)Math.round(distance * 100d) / 100d;
-                    distanceTextView.setText(String.format("%s Km", distance));
-                } else  {
-                    distance = (double)Math.round(distance);
-                    distanceTextView.setText(String.format("%sm", distance));
-                }
+                String geometry=route.getGeometry();
 
-                if (route.getGeometry() == null || route.getGeometry().getCoordinates() == null) {
-                    return;
-                }
-                ArrayList<LatLng> coordinates = new ArrayList<>(route.getGeometry().getCoordinates());
-
-                drawCoordinatesInBound(coordinates, route.getBoundingBox());
+                drawCoordinatesInBound(geometry);
 
                 hintLayout.setVisibility(View.GONE);
                 resultLayout.setVisibility(View.VISIBLE);
-
 
             }
             @Override
@@ -231,62 +223,21 @@ public class DirectionFragment extends Fragment {
 
 
 
-        CedarMaps.getInstance().direction(departure, destination,
-                new GeoRoutingResultListener() {
-                    @Override
-                    public void onSuccess(@NonNull GeoRouting result) {
-                        progressBar.clearAnimation();
-                        if (result.getRoutes() == null) {
-                            return;
-                        }
-                        Route route = result.getRoutes().get(0);
-                        Double distance = route.getDistance();
-                        if (distance == null) {
-                            return;
-                        }
-                        if (distance > 1000) {
-                            distance = distance / 1000.0;
-                            distance = (double)Math.round(distance * 100d) / 100d;
-                            distanceTextView.setText(String.format("%s Km", distance));
-                        } else  {
-                            distance = (double)Math.round(distance);
-                            distanceTextView.setText(String.format("%sm", distance));
-                        }
 
-                        if (route.getGeometry() == null || route.getGeometry().getCoordinates() == null) {
-                            return;
-                        }
-                        ArrayList<LatLng> coordinates = new ArrayList<>(route.getGeometry().getCoordinates());
-
-                        drawCoordinatesInBound(coordinates, route.getBoundingBox());
-
-                        hintLayout.setVisibility(View.GONE);
-                        resultLayout.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull String error) {
-                        progressBar.clearAnimation();
-                        resetToInitialState();
-                        Toast.makeText(getActivity(),
-                                "خطا در دریافت اطلاعات مسیریابی" + "\n" + error,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
-    private void drawCoordinatesInBound(ArrayList<LatLng> coordinates, LatLngBounds bounds) {
+    private void drawCoordinatesInBound(String geometry) {
         if (mMapboxMap == null || getContext() == null) {
             return;
         }
-        LineOptions options = new LineOptions()
-                .withLatLngs(coordinates)
-                .withLineWidth(6f)
-                .withLineColor(ColorUtils.colorToRgbaString(ContextCompat.getColor(getContext(), R.color.colorPrimary)))
-                .withLineOpacity(0.9f);
-        lineManager.create(options);
 
-        mMapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), 1000);
+        LineString routeLine = LineString.fromPolyline(geometry, 5);
+        LineOptions lineOptions = new LineOptions()
+                .withGeometry(routeLine)
+                .withLineColor("#ff5252")
+                .withLineWidth(5f);
+        lineManager.create(lineOptions);
+
     }
 
     private void resetToInitialState() {

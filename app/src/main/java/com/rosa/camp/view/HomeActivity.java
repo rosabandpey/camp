@@ -41,13 +41,14 @@ public class HomeActivity extends AppCompatActivity  {
         mtoolbar=findViewById(R.id.main_toolbar);
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-       tabLayout= findViewById(R.id.tab_layout);
-       viewPager= findViewById(R.id.view_pager);
+        tabLayout= findViewById(R.id.tab_layout);
+        viewPager= findViewById(R.id.view_pager);
 
         ViewPagerAdapter adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(new MapFragment(),"Map");
         adapter.addFrag(new HomeFragment(),"Home");
+        adapter.addFrag(new DirectionFragment(),"Home");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.profileicon);
