@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/directionFragment"
     tools:context=".DirectionFragment">
 
     <ir.map.sdk_map.maps.MapView

@@ -137,8 +137,6 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
                         }
                     }
                 }
-
-           // Fragment fragment = homeActivity.getSupportFragmentManager().findFragmentById(R.id.content);
         }
     }
 
