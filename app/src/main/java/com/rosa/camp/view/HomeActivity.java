@@ -31,8 +31,8 @@ public class HomeActivity extends AppCompatActivity  {
 
     Toolbar mtoolbar;
     TabLayout tabLayout;
-   public static ViewPager viewPager;
-
+    public static ViewPager viewPager;
+    public static ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class HomeActivity extends AppCompatActivity  {
         tabLayout= findViewById(R.id.tab_layout);
         viewPager= findViewById(R.id.view_pager);
 
-        ViewPagerAdapter adapter=new ViewPagerAdapter(getSupportFragmentManager());
+        adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(new MapFragment(),"Map");
         adapter.addFrag(new HomeFragment(),"Home");

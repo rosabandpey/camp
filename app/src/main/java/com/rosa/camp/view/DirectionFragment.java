@@ -109,6 +109,12 @@ public class DirectionFragment extends Fragment {
     public DirectionFragment() {
         // Required empty public constructor
     }
+
+    public static DirectionFragment newInstance() {
+        DirectionFragment f = new DirectionFragment();
+        return f;
+    }
+
     private enum State {
         MAP,
         MAP_PIN,

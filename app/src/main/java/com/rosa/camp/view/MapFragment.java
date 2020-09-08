@@ -126,6 +126,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private SearchViewAdapter mRecyclerAdapter;
     private RecyclerView mRecyclerView;
     private State state = State.MAP;
+    Button searchButton;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
@@ -156,15 +157,13 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         switch (view.getId()) {
             case R.id.search_button1:
 
-               HomeActivity.viewPager.setCurrentItem(0);
+            FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
+            trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
+            trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            trans.addToBackStack(null);
+            trans.commit();
+            searchButton.setVisibility(View.GONE);
                 break;
-               /*Fragment mFragment = new DirectionFragment();
-                String activity=getActivity().toString();
-                Log.d("activity",activity);
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.directionFragment, mFragment)
-                        .commit(); */
         }
     }
 
@@ -441,7 +440,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         sProgressBar = view.findViewById(R.id.search_progress_bar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-        Button searchButton = view.findViewById(R.id.search_button1);
+        searchButton = view.findViewById(R.id.search_button1);
         searchButton.setOnClickListener(this);
 
         statusCheck();
