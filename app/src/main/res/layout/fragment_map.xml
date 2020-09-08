@@ -73,11 +73,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/search_button"
+        android:id="@+id/search_button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="left"
         android:padding="8dp"
-        android:text="Direction" />
+        android:text="@string/direction"
+        tools:ignore="RtlHardcoded" />
 
 </FrameLayout>

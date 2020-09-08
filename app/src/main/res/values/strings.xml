@@ -48,4 +48,5 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="PersonalInfo">اطلاعات شخصی</string>
     <string name="save">ذخیره</string>
+    <string name="direction">Direction</string>
 </resources>

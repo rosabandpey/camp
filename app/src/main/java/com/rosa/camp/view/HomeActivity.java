@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity  {
 
     Toolbar mtoolbar;
     TabLayout tabLayout;
-    ViewPager viewPager;
+   public static ViewPager viewPager;
 
 
     @Override
@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity  {
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(new MapFragment(),"Map");
         adapter.addFrag(new HomeFragment(),"Home");
-        adapter.addFrag(new DirectionFragment(),"Home");
+        //adapter.addFrag(new DirectionFragment(),"Home");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.profileicon);

@@ -28,6 +28,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -111,7 +112,7 @@ import java.util.List;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements PermissionsListener {
+public class MapFragment extends Fragment implements PermissionsListener, View.OnClickListener {
 
 
     MapboxMap mapboxMap;
@@ -127,7 +128,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
     private State state = State.MAP;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
-    private Button searchButton;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
     private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
@@ -151,7 +151,22 @@ public class MapFragment extends Fragment implements PermissionsListener {
         // Required empty public constructor
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.search_button1:
 
+               HomeActivity.viewPager.setCurrentItem(0);
+                break;
+               /*Fragment mFragment = new DirectionFragment();
+                String activity=getActivity().toString();
+                Log.d("activity",activity);
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.directionFragment, mFragment)
+                        .commit(); */
+        }
+    }
 
     private enum State {
         MAP,
@@ -340,12 +355,9 @@ public class MapFragment extends Fragment implements PermissionsListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
-        //return inflater.inflate(R.layout.fragment_map, container, false);
-        View myView = inflater.inflate(R.layout.fragment_map, container, false);
+        return inflater.inflate(R.layout.fragment_map, container, false);
 
-        return myView;
     }
-
         public void statusCheck() {
         final LocationManager manager = (LocationManager)
                 getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -429,17 +441,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
         sProgressBar = view.findViewById(R.id.search_progress_bar);
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-        searchButton=view.findViewById(R.id.search_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment mFragment = new DirectionFragment();
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.directionFragment,mFragment)
-                        .commit();
-            }
-        });
+        Button searchButton = view.findViewById(R.id.search_button1);
+        searchButton.setOnClickListener(this);
 
         statusCheck();
 
