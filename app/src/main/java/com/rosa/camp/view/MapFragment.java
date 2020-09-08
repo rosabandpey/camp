@@ -151,6 +151,10 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public MapFragment() {
         // Required empty public constructor
     }
+    public static MapFragment newInstance() {
+        MapFragment f = new MapFragment();
+        return f;
+    }
 
     @Override
     public void onClick(View view) {

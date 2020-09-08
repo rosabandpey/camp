@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -69,7 +71,7 @@ import okhttp3.Route;
  * Use the {@link DirectionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DirectionFragment extends Fragment {
+public class DirectionFragment extends Fragment implements View.OnClickListener {
 
     public Style mapStyle;
     private static final String DEPARTURE_IMAGE = "DEPARTURE_IMAGE";
@@ -92,6 +94,7 @@ public class DirectionFragment extends Fragment {
     private LinearLayout mLinearLayout;
     private SymbolManager symbolManager;
     private LineManager lineManager;
+    Button backToMapButton;
     private MapService mapService = new MapService();
 
     private ArrayList<Symbol> symbols = new ArrayList<>();
@@ -113,6 +116,20 @@ public class DirectionFragment extends Fragment {
     public static DirectionFragment newInstance() {
         DirectionFragment f = new DirectionFragment();
         return f;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.backToMapButton:
+                FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
+                trans.replace(R.id.directionFragment, MapFragment.newInstance());
+                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                trans.addToBackStack(null);
+                trans.commit();
+                backToMapButton.setVisibility(View.GONE);
+                break;
+        }
     }
 
     private enum State {
@@ -188,7 +205,8 @@ public class DirectionFragment extends Fragment {
         distanceTextView = view.findViewById(R.id.direction_distance_text_view);
         sProgressBar = view.findViewById(R.id.search_progress_bar);
         view.findViewById(R.id.direction_reset_button).setOnClickListener(v -> resetToInitialState());
-
+        backToMapButton=view.findViewById(R.id.backToMapButton);
+        backToMapButton.setOnClickListener(this);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
