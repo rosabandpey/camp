@@ -1,9 +1,13 @@
 package com.rosa.camp.view;
 
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -48,7 +52,9 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
 import com.rosa.camp.ui.adapter.SearchViewAdapter;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import ir.map.sdk_map.MapirStyle;
@@ -60,8 +66,10 @@ import ir.map.servicesdk.enums.SelectOptions;
 import ir.map.servicesdk.model.base.MapirError;
 import ir.map.servicesdk.model.inner.RouteItem;
 import ir.map.servicesdk.model.inner.SearchItem;
+import ir.map.servicesdk.request.EstimatedTimeArrivalRequest;
 import ir.map.servicesdk.request.RouteRequest;
 import ir.map.servicesdk.request.SearchRequest;
+import ir.map.servicesdk.response.EstimatedTimeArrivalResponse;
 import ir.map.servicesdk.response.RouteResponse;
 import ir.map.servicesdk.response.SearchResponse;
 import okhttp3.Route;
@@ -83,6 +91,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private ProgressBar progressBar;
     private TextView hintTextView;
     private TextView distanceTextView;
+    private TextView timeTextView;
     private ProgressBar sProgressBar;
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
@@ -113,10 +122,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         // Required empty public constructor
     }
 
-    public static DirectionFragment newInstance() {
-        DirectionFragment f = new DirectionFragment();
-        return f;
-    }
+
 
     @Override
     public void onClick(View view) {
@@ -166,12 +172,10 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
      * @return A new instance of fragment DirectionFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DirectionFragment newInstance(String param1, String param2) {
+    public static DirectionFragment newInstance() {
         DirectionFragment fragment = new DirectionFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        
         return fragment;
     }
 
@@ -196,13 +200,13 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mMapView = view.findViewById(R.id.mapView);
         hintLayout = view.findViewById(R.id.direction_hint_layout);
         resultLayout = view.findViewById(R.id.direction_result_layout);
         progressBar = view.findViewById(R.id.direction_progress_bar);
         hintTextView = view.findViewById(R.id.direction_hint_text_view);
         distanceTextView = view.findViewById(R.id.direction_distance_text_view);
+        timeTextView = view.findViewById(R.id.direction_time_text_view);
         sProgressBar = view.findViewById(R.id.search_progress_bar);
         view.findViewById(R.id.direction_reset_button).setOnClickListener(v -> resetToInitialState());
         backToMapButton=view.findViewById(R.id.backToMapButton);
@@ -223,7 +227,6 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                         style.addImage(DEPARTURE_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_start)));
                         style.addImage(DESTINATION_IMAGE, Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.cedarmaps_marker_icon_end)));
                         symbolManager = new SymbolManager(mMapView, mMapboxMap, style);
-
                         lineManager = new LineManager(mMapView, mMapboxMap, style);
                         // TODO;
 
@@ -240,6 +243,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                     } else if (symbols.size() == 1) {
                         addMarkerToMapViewAtPosition(latLng, DESTINATION_IMAGE);
                         computeDirection(symbols.get(0).getLatLng(), symbols.get(1).getLatLng());
+                        computeTime(symbols.get(0).getLatLng(), symbols.get(1).getLatLng());
                     }
                     return true;
                 });
@@ -271,6 +275,61 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
 
     }
 
+    private void computeTime(LatLng departure, LatLng destination){
+
+
+            EstimatedTimeArrivalRequest requestBody = new EstimatedTimeArrivalRequest.Builder(departure.getLatitude(), departure.getLongitude())
+                    .addDestination(destination.getLatitude(), destination.getLongitude())
+                    .build();
+            mapService.estimatedTimeArrival(
+                    requestBody,
+                    new ResponseListener<EstimatedTimeArrivalResponse>() {
+                        @RequiresApi(api = Build.VERSION_CODES.N)
+                        @Override
+                        public void onSuccess(EstimatedTimeArrivalResponse response) {
+                            Toast.makeText(getActivity(), "پاسخ تخمین زمان رسیدن دریافت شد", Toast.LENGTH_SHORT).show();
+                            Double distance = response.getDistance();
+                            Double time = response.getDuration();
+
+                            SimpleDateFormat format = new SimpleDateFormat("HHmmss");
+                            String intValueStr = String.valueOf(time.intValue() );
+                            int length = intValueStr.length();
+                            int missingDigits = 6- length;
+                            String strForTimeParsing = intValueStr;
+                            for(int i =0; i< missingDigits;i++){
+                                strForTimeParsing = "0"+strForTimeParsing;
+                            }
+                            System.out.println("Final String after padding Zeros at the start = "+strForTimeParsing);
+
+                            Date parsedDate = null;
+                            try {
+                                parsedDate = format.parse(strForTimeParsing);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            String format1 = new SimpleDateFormat("HH:mm:ss").format(parsedDate);
+                            timeTextView.setText(format1);
+
+                            if (distance == null) {
+                                return;
+                            }
+                            if (distance > 1000) {
+                                distance = distance / 1000.0;
+                                distance = (double)Math.round(distance * 100d) / 100d;
+                                distanceTextView.setText(String.format("%s Km", distance));
+                            } else  {
+                                distance = (double)Math.round(distance);
+                                distanceTextView.setText(String.format("%sm", distance));
+                            }
+                        }
+                        @Override
+                        public void onError(MapirError error) {
+                            Toast.makeText(getActivity(), "مشکلی در تخمین زمان رسیدن پیش آمده", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+
+
     private void computeDirection(LatLng departure, LatLng destination) {
         progressBar.setVisibility(View.VISIBLE);
         hintTextView.setVisibility(View.GONE);
@@ -293,14 +352,11 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                 }
                 RouteItem route = response.getRoutes().get(0);
 
-
-
                 if (route.getGeometry() == null ) {
                     return;
                 }
                 String geometry=route.getGeometry();
                 drawCoordinatesInBound(geometry);
-
                 hintLayout.setVisibility(View.GONE);
                 resultLayout.setVisibility(View.VISIBLE);
 
@@ -321,7 +377,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
 
     private void drawCoordinatesInBound(String geometry) {
         if (mMapboxMap == null || getContext() == null) {
-            return;
+          return;
         }
 
         LineString routeLine = LineString.fromPolyline(geometry, 5);
@@ -351,6 +407,9 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                     .withIconOffset(new Float[]{0f, -22f})
                     .withIconImage(imageName);
             symbols.add(symbolManager.create(options));
+        }
+        else {
+            Log.d("symbols","no symbols");
         }
     }
 

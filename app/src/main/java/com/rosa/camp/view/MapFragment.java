@@ -151,10 +151,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public MapFragment() {
         // Required empty public constructor
     }
-    public static MapFragment newInstance() {
-        MapFragment f = new MapFragment();
-        return f;
-    }
+
 
     @Override
     public void onClick(View view) {
@@ -163,8 +160,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
             FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
             trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
-            trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            trans.addToBackStack(null);
+           // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            //trans.addToBackStack(null);
             trans.commit();
             searchButton.setVisibility(View.GONE);
                 break;
@@ -205,12 +202,10 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
      * @return A new instance of fragment MapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2) {
+    public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
