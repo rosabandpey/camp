@@ -121,14 +121,14 @@
                 android:paddingEnd="4dp"
                 android:paddingRight="4dp"
                 android:textSize="18sp" />
+            <Button
+                android:id="@+id/direction_reset_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="انتخاب دوباره"/>
 
         </LinearLayout>
-        <Button
-            android:id="@+id/direction_reset_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="انتخاب دوباره"/>
 
     </LinearLayout>
     <Button

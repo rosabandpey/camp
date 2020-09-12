@@ -138,6 +138,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
     private final int REQUEST_LOCATION_PERMISSION = 1;
+    private static MapFragment INSTANCE ;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -160,10 +161,11 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
             FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
             trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
-           // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            //trans.addToBackStack(null);
+            trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            trans.addToBackStack(null);
             trans.commit();
             searchButton.setVisibility(View.GONE);
+
                 break;
         }
     }
@@ -203,11 +205,13 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
      */
     // TODO: Rename and change types and number of parameters
     public static MapFragment newInstance() {
-        MapFragment fragment = new MapFragment();
-        Bundle args = new Bundle();
+    MapFragment INSTANCE=new MapFragment();
 
-        return fragment;
+          return INSTANCE;
     }
+
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -215,6 +219,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            mTextView.setVisibility(View.GONE);
         }
 
     }
@@ -435,6 +440,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mTextView = view.findViewById(R.id.reverse_geocode_textView);
+        mTextView.setText("");
         mProgressBar = view.findViewById(R.id.reverse_geocode_progressBar);
         sProgressBar = view.findViewById(R.id.search_progress_bar);
         mapView = view.findViewById(R.id.map_view);

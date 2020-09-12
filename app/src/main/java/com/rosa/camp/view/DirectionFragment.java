@@ -87,7 +87,8 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private MapView mMapView;
     private MapboxMap mMapboxMap;
     private LinearLayout hintLayout;
-    private LinearLayout resultLayout;
+    private LinearLayout directionResultLayout;
+    private Button directionResetButton;
     private ProgressBar progressBar;
     private TextView hintTextView;
     private TextView distanceTextView;
@@ -96,18 +97,17 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private AppCompatTextView mTextView;
     private LocationEngine locationEngine = null;
     private SearchView mSearchView;
+    private State state = State.MAP;
     private SearchViewAdapter mRecyclerAdapter;
     private RecyclerView mRecyclerView;
-    private DirectionFragment.State state = DirectionFragment.State.MAP;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
     private SymbolManager symbolManager;
     private LineManager lineManager;
     Button backToMapButton;
     private MapService mapService = new MapService();
-
     private ArrayList<Symbol> symbols = new ArrayList<>();
-
+    MapFragment newInstance;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -123,17 +123,24 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     }
 
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
             case R.id.backToMapButton:
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-                trans.replace(R.id.directionFragment, MapFragment.newInstance());
+
+                newInstance=MapFragment.newInstance();
+                String backStateName =  newInstance().getClass().getName();
+                String fragmentTag = backStateName;
+                trans.replace(R.id.directionFragment,newInstance,fragmentTag);
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                trans.addToBackStack(null);
+                trans.addToBackStack(backStateName);
                 trans.commit();
                 backToMapButton.setVisibility(View.GONE);
+                hintLayout.setVisibility(View.GONE);
+                directionResultLayout.setVisibility(View.VISIBLE);
+                directionResetButton.setVisibility(View.GONE);
                 break;
         }
     }
@@ -144,7 +151,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         SEARCHING,
         RESULTS
     }
-    private void setState(DirectionFragment.State state) {
+    private void setState(State state) {
         this.state = state;
         switch (state) {
             case MAP:
@@ -175,7 +182,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     public static DirectionFragment newInstance() {
         DirectionFragment fragment = new DirectionFragment();
         Bundle args = new Bundle();
-        
+
         return fragment;
     }
 
@@ -202,13 +209,14 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         super.onViewCreated(view, savedInstanceState);
         mMapView = view.findViewById(R.id.mapView);
         hintLayout = view.findViewById(R.id.direction_hint_layout);
-        resultLayout = view.findViewById(R.id.direction_result_layout);
+        directionResultLayout = view.findViewById(R.id.direction_result_layout);
         progressBar = view.findViewById(R.id.direction_progress_bar);
         hintTextView = view.findViewById(R.id.direction_hint_text_view);
         distanceTextView = view.findViewById(R.id.direction_distance_text_view);
         timeTextView = view.findViewById(R.id.direction_time_text_view);
         sProgressBar = view.findViewById(R.id.search_progress_bar);
-        view.findViewById(R.id.direction_reset_button).setOnClickListener(v -> resetToInitialState());
+        directionResetButton=view.findViewById(R.id.direction_reset_button);
+        directionResetButton.setOnClickListener(v -> resetToInitialState());
         backToMapButton=view.findViewById(R.id.backToMapButton);
         backToMapButton.setOnClickListener(this);
         mMapView.onCreate(savedInstanceState);
@@ -238,6 +246,8 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                 mMapboxMap.setMinZoomPreference(6);
 
                 mMapboxMap.addOnMapClickListener(latLng -> {
+                    String size= String.valueOf(symbols.size());
+                    Log.d("symbolsize",size);
                     if (symbols.size() == 0) {
                         addMarkerToMapViewAtPosition(latLng, DEPARTURE_IMAGE);
                     } else if (symbols.size() == 1) {
@@ -321,6 +331,9 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                                 distance = (double)Math.round(distance);
                                 distanceTextView.setText(String.format("%sm", distance));
                             }
+
+                            hintLayout.setVisibility(View.GONE);
+                            directionResultLayout.setVisibility(View.VISIBLE);
                         }
                         @Override
                         public void onError(MapirError error) {
@@ -358,7 +371,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                 String geometry=route.getGeometry();
                 drawCoordinatesInBound(geometry);
                 hintLayout.setVisibility(View.GONE);
-                resultLayout.setVisibility(View.VISIBLE);
+                directionResultLayout.setVisibility(View.VISIBLE);
 
             }
             @Override
@@ -394,7 +407,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         lineManager.deleteAll();
         symbols.clear();
 
-        resultLayout.setVisibility(View.GONE);
+        directionResultLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         hintTextView.setVisibility(View.VISIBLE);
         hintLayout.setVisibility(View.VISIBLE);
@@ -504,7 +517,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     }
 
     public void showItemOnMap(final SearchItem item) {
-        Log.d("onclick","view clicked");
+
         setState(DirectionFragment.State.MAP_PIN);
         if (getActivity() == null || item.getGeom().getCoordinates() == null) {
             return;
