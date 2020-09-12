@@ -131,11 +131,13 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
 
                 newInstance=MapFragment.newInstance();
-                String backStateName =  newInstance().getClass().getName();
-                String fragmentTag = backStateName;
-                trans.replace(R.id.directionFragment,newInstance,fragmentTag);
+                String s=newInstance.toString();
+                Log.d("ins",s);
+               // String backStateName =  newInstance().getClass().getName();
+                //String fragmentTag = backStateName;
+                trans.replace(R.id.directionFragment,newInstance);
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                trans.addToBackStack(backStateName);
+                trans.addToBackStack(null);
                 trans.commit();
                 backToMapButton.setVisibility(View.GONE);
                 hintLayout.setVisibility(View.GONE);

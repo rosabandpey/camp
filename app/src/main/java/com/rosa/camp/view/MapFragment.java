@@ -138,7 +138,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
     private final int REQUEST_LOCATION_PERMISSION = 1;
-    private static MapFragment INSTANCE ;
+    public static MapFragment instance=null ;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -151,6 +151,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
     public MapFragment() {
         // Required empty public constructor
+
     }
 
 
@@ -205,17 +206,20 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
      */
     // TODO: Rename and change types and number of parameters
     public static MapFragment newInstance() {
-    MapFragment INSTANCE=new MapFragment();
+        if (instance==null){
+            instance=new MapFragment();
+        }else {
+            Log.d("instance","instance is not null");
+        }
 
-          return INSTANCE;
+          return instance;
     }
-
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            Log.d("state", "state is not null");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -438,6 +442,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null)
+            Log.d("state", "state is not null");
         super.onViewCreated(view, savedInstanceState);
         mTextView = view.findViewById(R.id.reverse_geocode_textView);
         mTextView.setText("");
