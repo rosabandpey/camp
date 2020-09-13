@@ -108,7 +108,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private MapService mapService = new MapService();
     private ArrayList<Symbol> symbols = new ArrayList<>();
     MapFragment newInstance;
-    public  static  DirectionFragment dFnewInstance;
+   public static DirectionFragment instance=null ;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -135,8 +135,8 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
 
                // String backStateName =  newInstance().getClass().getName();
                 //String fragmentTag = backStateName;
-                Fragment target = newInstance;
-                Fragment source=dFnewInstance;
+                Fragment target = MapFragment.newInstance();
+                Fragment source=DirectionFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 if(target.isAdded()) {
@@ -195,13 +195,11 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
      */
     // TODO: Rename and change types and number of parameters
     public static DirectionFragment newInstance() {
-        if (dFnewInstance==null) {
-            dFnewInstance = new DirectionFragment();
-            Bundle args = new Bundle();
-        }else {
-            Log.d("instance","instance is not null");
+        if (instance==null) {
+            instance = new DirectionFragment();
         }
-        return dFnewInstance;
+
+        return instance;
     }
 
     @Override

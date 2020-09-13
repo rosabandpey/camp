@@ -139,6 +139,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private static final String MARKER_ICON_ID = "marker-icon-id";
     private final int REQUEST_LOCATION_PERMISSION = 1;
     public static MapFragment instance=null ;
+    public  static  MapFragment dFnewInstance=null;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -160,10 +161,22 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         switch (view.getId()) {
             case R.id.search_button1:
 
-            FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-            trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
-            trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            trans.addToBackStack(null);
+
+                Fragment target = DirectionFragment.newInstance();
+                Fragment source=MapFragment.newInstance();
+                FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
+                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                if(target.isAdded()) {
+                    trans.show(target);
+                    trans.hide(source);
+
+                } else {
+                    trans.addToBackStack( "stack_item");
+                    trans.replace(R.id.mapFrag, target);
+                }
+          //trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
+           // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+           // trans.addToBackStack(null);
             trans.commit();
             searchButton.setVisibility(View.GONE);
 
