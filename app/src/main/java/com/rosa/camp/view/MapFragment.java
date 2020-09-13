@@ -223,7 +223,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mTextView.setVisibility(View.GONE);
+
         }
 
     }
@@ -730,6 +730,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public void onStart() {
         super.onStart();
         mapView.onStart();
+        searchButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -742,6 +743,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public void onResume() {
         super.onResume();
         mapView.onResume();
+        searchButton.setVisibility(View.VISIBLE);
     }
 
     @Override

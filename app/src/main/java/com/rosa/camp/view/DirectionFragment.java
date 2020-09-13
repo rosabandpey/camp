@@ -108,6 +108,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private MapService mapService = new MapService();
     private ArrayList<Symbol> symbols = new ArrayList<>();
     MapFragment newInstance;
+    public  static  DirectionFragment dFnewInstance;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -128,17 +129,29 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         switch (view.getId()) {
 
             case R.id.backToMapButton:
-                FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
+
 
                 newInstance=MapFragment.newInstance();
-                String s=newInstance.toString();
-                Log.d("ins",s);
+
                // String backStateName =  newInstance().getClass().getName();
                 //String fragmentTag = backStateName;
-                trans.replace(R.id.directionFragment,newInstance);
+                Fragment target = newInstance;
+                Fragment source=dFnewInstance;
+                FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                trans.addToBackStack(null);
+                if(target.isAdded()) {
+                    trans.show(target);
+                    trans.hide(source);
+
+                } else {
+                    trans.addToBackStack( "stack_item");
+                    trans.replace(R.id.directionFragment, target);
+                }
                 trans.commit();
+               // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+               // trans.addToBackStack(null);
+
+
                 backToMapButton.setVisibility(View.GONE);
                 hintLayout.setVisibility(View.GONE);
                 directionResultLayout.setVisibility(View.VISIBLE);
@@ -182,10 +195,13 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
      */
     // TODO: Rename and change types and number of parameters
     public static DirectionFragment newInstance() {
-        DirectionFragment fragment = new DirectionFragment();
-        Bundle args = new Bundle();
-
-        return fragment;
+        if (dFnewInstance==null) {
+            dFnewInstance = new DirectionFragment();
+            Bundle args = new Bundle();
+        }else {
+            Log.d("instance","instance is not null");
+        }
+        return dFnewInstance;
     }
 
     @Override

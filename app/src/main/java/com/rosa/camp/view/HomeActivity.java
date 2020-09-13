@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity  {
     ViewPager viewPager;
     ViewPagerAdapter adapter;
     MapFragment instance;
+    DirectionFragment dInstance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +45,12 @@ public class HomeActivity extends AppCompatActivity  {
         tabLayout= findViewById(R.id.tab_layout);
         viewPager= findViewById(R.id.view_pager);
         instance=MapFragment.newInstance();
+        dInstance=DirectionFragment.newInstance();
         adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(instance,"Map");
         adapter.addFrag(new HomeFragment(),"Home");
-        adapter.addFrag(new DirectionFragment(),"Home");
+        adapter.addFrag(dInstance,"Home");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.profileicon);
