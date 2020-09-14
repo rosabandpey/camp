@@ -50,7 +50,7 @@ public class HomeActivity extends AppCompatActivity  {
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(instance,"Map");
         adapter.addFrag(new HomeFragment(),"Home");
-        adapter.addFrag(dInstance,"Home");
+       // adapter.addFrag(dInstance,"Home");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.profileicon);

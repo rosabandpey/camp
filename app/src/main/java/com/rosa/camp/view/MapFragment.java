@@ -146,7 +146,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    int number;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -167,27 +167,39 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 Fragment target = DirectionFragment.newInstance();
                 Fragment source=MapFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-                Fragment fragmentb =getActivity().getSupportFragmentManager().findFragmentByTag("direction");
+               // Fragment fragmentb =getActivity().getSupportFragmentManager().findFragmentByTag("direction");
 
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
-                if(fragmentb!=null) {
+              //  trans.hide(source);
+              //  if(fragmentb!=null) {
                    // trans.hide(source);
+                   // trans.show(target);
+
+                  //  Log.d("target","target is added");
+              //  } else {
+                if(target.isAdded()) {
                     trans.show(target);
 
-                    Log.d("target","target is added");
+                    Log.d("target","target  is added");
+                   // trans.replace(R.id.mapFrag, new DirectionFragment());
+                   // trans.show(new DirectionFragment());
+
                 } else {
-                //    trans.addToBackStack( "stack_item");
-                //    trans.replace(R.id.view_pager, target);
-                    trans.add(R.id.mapFrag,target,"direction");
-                    trans.show(target);
-                    Log.d("target","target  is null");
-               }
+                   // trans.addToBackStack( "stack_item");
+                    trans.replace(R.id.mapFrag,target);
+                  //  trans.show(new DirectionFragment());
+                }
+                   // trans.add(R.id.mapFrag,target,"direction");
+
+                   // trans.hide(source);
+                   // trans.show(target);
+                   // Log.d("target","target  is null");
+          //     }
           //trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
            // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
            // trans.addToBackStack(null);
             trans.commit();
-           // searchButton.setVisibility(View.GONE);
+         //   searchButton.setVisibility(View.GONE);
 
                 break;
         }
@@ -231,7 +243,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (instance==null){
             instance=new MapFragment();
         }else {
-            Log.d("instance","instance is not null");
+            Log.d("instance","instance of map frag is not null");
         }
 
           return instance;
@@ -242,6 +254,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null)
             Log.d("state", "state is null");
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -474,7 +487,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         mapView.onCreate(savedInstanceState);
         searchButton = view.findViewById(R.id.search_button1);
         searchButton.setOnClickListener(this);
-
+        searchButton.setVisibility(View.VISIBLE);
         statusCheck();
 
         //Installing Map
@@ -750,23 +763,24 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     @SuppressWarnings({"MissingPermission"})
     public void onStart() {
         super.onStart();
-        //mapView.onStart();
-
+        mapView.onStart();
+        searchButton.setVisibility(View.VISIBLE);
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-       // mapView.onStop();
+        mapView.onStop();
+       // searchButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-       // mapView.onResume();
+        mapView.onResume();
 
-
+        searchButton.setVisibility(View.VISIBLE);
     }
 
 
@@ -783,14 +797,14 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     @Override
     public void onPause() {
         super.onPause();
-      //  mapView.onPause();
+        mapView.onPause();
 
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-      //  mapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
@@ -799,14 +813,14 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (locationEngine != null) {
             locationEngine.removeLocationUpdates(callback);
         }
-      //  mapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
 
-      //  mapView = null;
+        mapView = null;
     }
 
 

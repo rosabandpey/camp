@@ -142,20 +142,24 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                 if(target.isAdded()) {
                     trans.show(target);
                     trans.hide(source);
+                  //  trans.replace(R.id.directionFragment, new MapFragment());
+
+                    Log.d("target","target  is added");
+                   // trans.addToBackStack( "stack_item");
 
                 } else {
-                    trans.addToBackStack( "stack_item");
-                    trans.replace(R.id.directionFragment, target);
+                   // trans.addToBackStack( "stack_item");
+                    trans.replace(R.id.directionFragment,target);
                 }
                 trans.commit();
                // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                // trans.addToBackStack(null);
 
 
-                backToMapButton.setVisibility(View.GONE);
-                hintLayout.setVisibility(View.GONE);
-                directionResultLayout.setVisibility(View.VISIBLE);
-                directionResetButton.setVisibility(View.GONE);
+              //  backToMapButton.setVisibility(View.GONE);
+              //  hintLayout.setVisibility(View.GONE);
+              //  directionResultLayout.setVisibility(View.VISIBLE);
+            //  directionResetButton.setVisibility(View.GONE);
                 break;
         }
     }
@@ -198,7 +202,9 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         if (instance==null) {
             instance = new DirectionFragment();
         }
-
+        else {
+            Log.d("instance","instance of direction frag is not null");
+        }
         return instance;
     }
 
