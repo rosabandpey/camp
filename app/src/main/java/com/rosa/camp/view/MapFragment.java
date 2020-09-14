@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -114,7 +115,7 @@ import java.util.List;
  */
 public class MapFragment extends Fragment implements PermissionsListener, View.OnClickListener {
 
-
+    boolean mIsVisibleToUser;
     MapboxMap mapboxMap;
     public Style mapStyle;
     MapView mapView;
@@ -126,7 +127,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private SearchViewAdapter mRecyclerAdapter;
     private RecyclerView mRecyclerView;
     private State state = State.MAP;
-    Button searchButton;
+    public  Button searchButton;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
@@ -156,6 +157,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     }
 
 
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -165,20 +167,27 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 Fragment target = DirectionFragment.newInstance();
                 Fragment source=MapFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                if(target.isAdded()) {
-                    trans.show(target);
-                    trans.hide(source);
+                Fragment fragmentb =getActivity().getSupportFragmentManager().findFragmentByTag("direction");
 
+                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+                if(fragmentb!=null) {
+                   // trans.hide(source);
+                    trans.show(target);
+
+                    Log.d("target","target is added");
                 } else {
-                    trans.addToBackStack( "stack_item");
-                    trans.replace(R.id.mapFrag, target);
-                }
+                //    trans.addToBackStack( "stack_item");
+                //    trans.replace(R.id.view_pager, target);
+                    trans.add(R.id.mapFrag,target,"direction");
+                    trans.show(target);
+                    Log.d("target","target  is null");
+               }
           //trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
            // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
            // trans.addToBackStack(null);
             trans.commit();
-            searchButton.setVisibility(View.GONE);
+           // searchButton.setVisibility(View.GONE);
 
                 break;
         }
@@ -231,8 +240,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null)
-            Log.d("state", "state is not null");
+        if (savedInstanceState == null)
+            Log.d("state", "state is null");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -455,8 +464,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null)
-            Log.d("state", "state is not null");
+
         super.onViewCreated(view, savedInstanceState);
         mTextView = view.findViewById(R.id.reverse_geocode_textView);
         mTextView.setText("");
@@ -742,33 +750,47 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     @SuppressWarnings({"MissingPermission"})
     public void onStart() {
         super.onStart();
-        mapView.onStart();
-        searchButton.setVisibility(View.VISIBLE);
+        //mapView.onStart();
+
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mapView.onStop();
+       // mapView.onStop();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+       // mapView.onResume();
+
+
+    }
+
+
+
+    private void show() {
         searchButton.setVisibility(View.VISIBLE);
     }
+
+    private void hide() {
+        Log.d("hide","fragment is hidden");
+    }
+
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+      //  mapView.onPause();
+
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+      //  mapView.onLowMemory();
     }
 
     @Override
@@ -777,14 +799,14 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (locationEngine != null) {
             locationEngine.removeLocationUpdates(callback);
         }
-        mapView.onDestroy();
+      //  mapView.onDestroy();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
 
-        mapView = null;
+      //  mapView = null;
     }
 
 
