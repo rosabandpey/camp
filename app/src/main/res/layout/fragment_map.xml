@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/mapFrag"
+    android:orientation="vertical"
     android:tag="map"
     tools:context=".view.MapFragment">
+    <FrameLayout
+        android:id="@+id/your_placeholderMap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -83,6 +87,6 @@
             android:visibility="gone"/>
 
     </LinearLayout>
+    </FrameLayout>
 
-
-</FrameLayout>
+</LinearLayout>

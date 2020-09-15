@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity  {
         dInstance=DirectionFragment.newInstance();
         adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
-        adapter.addFrag(instance,"Map");
+        adapter.addFrag(new MapFragment(),"Map");
         adapter.addFrag(new HomeFragment(),"Home");
        // adapter.addFrag(dInstance,"Home");
         viewPager.setAdapter(adapter);

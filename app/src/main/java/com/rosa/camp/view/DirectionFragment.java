@@ -55,6 +55,7 @@ import com.rosa.camp.ui.adapter.SearchViewAdapter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import ir.map.sdk_map.MapirStyle;
@@ -109,6 +110,7 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
     private ArrayList<Symbol> symbols = new ArrayList<>();
     MapFragment newInstance;
    public static DirectionFragment instance=null ;
+    DirectionFragment fragmentDemo;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -135,22 +137,36 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
 
                // String backStateName =  newInstance().getClass().getName();
                 //String fragmentTag = backStateName;
-                Fragment target = MapFragment.newInstance();
-                Fragment source=DirectionFragment.newInstance();
+               // Fragment target = MapFragment.newInstance();
+               // Fragment source=DirectionFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
+               // DirectionFragment fragmentDemo = (DirectionFragment)
+                    //    getActivity().getSupportFragmentManager().findFragmentById(R.id.directionFragment);
+                      //  List<Fragment> frag =getActivity().getSupportFragmentManager().getFragments();
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                if(target.isAdded()) {
-                    trans.show(target);
-                    trans.hide(source);
-                  //  trans.replace(R.id.directionFragment, new MapFragment());
+               // if(fragmentDemo.isAdded()) {
 
-                    Log.d("target","target  is added");
-                   // trans.addToBackStack( "stack_item");
+               // }
+                    //  for(int i=0;i<frag.size();i++)
+                   //  {
+                    //   Log.d("list",String.valueOf(frag.size()));
+                    //    Fragment source=getActivity().getSupportFragmentManager().findFragmentById(R.id.directionFragment);
 
-                } else {
+                       // if (frag.get(i)==source) {
+
+                       //  }
+                   //    }
+                    //     trans.show(target);
+
+                    trans.replace(R.id.your_placeholderDirection, new MapFragment());
+               // trans.hide(fragmentDemo);
+                    //    Log.d("target","target  is added");
+                     trans.addToBackStack( "stack_item");
+
+              //  } else {
                    // trans.addToBackStack( "stack_item");
-                    trans.replace(R.id.directionFragment,target);
-                }
+                //    trans.replace(R.id.directionFragment,target);
+             //   }
                 trans.commit();
                // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                // trans.addToBackStack(null);
@@ -242,6 +258,8 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
         backToMapButton=view.findViewById(R.id.backToMapButton);
         backToMapButton.setOnClickListener(this);
         mMapView.onCreate(savedInstanceState);
+        fragmentDemo = (DirectionFragment)
+                getActivity().getSupportFragmentManager().findFragmentById(R.id.directionFragment);
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

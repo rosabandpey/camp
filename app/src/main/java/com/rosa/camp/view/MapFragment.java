@@ -164,7 +164,10 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
             case R.id.search_button1:
 
 
-                Fragment target = DirectionFragment.newInstance();
+              //  Intent intent=new Intent(getContext(),DirectionActivity.class);
+              //  startActivity(intent);
+
+               // Fragment target = DirectionFragment.newInstance();
                 Fragment source=MapFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
                // Fragment fragmentb =getActivity().getSupportFragmentManager().findFragmentByTag("direction");
@@ -177,18 +180,18 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
                   //  Log.d("target","target is added");
               //  } else {
-                if(target.isAdded()) {
-                    trans.show(target);
+               // if(target.isAdded()) {
+               //     trans.show(target);
 
-                    Log.d("target","target  is added");
-                   // trans.replace(R.id.mapFrag, new DirectionFragment());
+               //     Log.d("target","target  is added");
+                    trans.replace(R.id.your_placeholderMap, new DirectionFragment());
                    // trans.show(new DirectionFragment());
 
-                } else {
-                   // trans.addToBackStack( "stack_item");
-                    trans.replace(R.id.mapFrag,target);
+              //  } else {
+                    trans.addToBackStack( "stack_item");
+              //      trans.replace(R.id.mapFrag,target);
                   //  trans.show(new DirectionFragment());
-                }
+             //   }
                    // trans.add(R.id.mapFrag,target,"direction");
 
                    // trans.hide(source);

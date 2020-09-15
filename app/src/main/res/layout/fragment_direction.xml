@@ -7,6 +7,12 @@
     android:id="@+id/directionFragment"
     tools:context="view.DirectionFragment">
 
+    <FrameLayout
+        android:id="@+id/your_placeholderDirection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
     <ir.map.sdk_map.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
@@ -70,6 +76,15 @@
             android:layout_gravity="center"
             android:visibility="gone"/>
 
+        <Button
+            android:id="@+id/backToMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:gravity="left"
+            android:padding="8dp"
+            android:text="cancel"
+            tools:ignore="RtlHardcoded" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -131,12 +146,8 @@
         </LinearLayout>
 
     </LinearLayout>
-    <Button
-        android:id="@+id/backToMapButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:padding="8dp"
-        android:text="cancel"
-        tools:ignore="RtlHardcoded" />
+
+    </FrameLayout>
+
+
 </LinearLayout>
