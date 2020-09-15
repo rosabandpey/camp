@@ -128,6 +128,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private RecyclerView mRecyclerView;
     private State state = State.MAP;
     public  Button searchButton;
+    FloatingActionButton fb;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
     private MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
@@ -163,46 +164,14 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         switch (view.getId()) {
             case R.id.search_button1:
 
-
-              //  Intent intent=new Intent(getContext(),DirectionActivity.class);
-              //  startActivity(intent);
-
-               // Fragment target = DirectionFragment.newInstance();
                 Fragment source=MapFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-               // Fragment fragmentb =getActivity().getSupportFragmentManager().findFragmentByTag("direction");
-
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-              //  trans.hide(source);
-              //  if(fragmentb!=null) {
-                   // trans.hide(source);
-                   // trans.show(target);
-
-                  //  Log.d("target","target is added");
-              //  } else {
-               // if(target.isAdded()) {
-               //     trans.show(target);
-
-               //     Log.d("target","target  is added");
-                    trans.replace(R.id.your_placeholderMap, new DirectionFragment());
-                   // trans.show(new DirectionFragment());
-
-              //  } else {
-                    trans.addToBackStack( "stack_item");
-              //      trans.replace(R.id.mapFrag,target);
-                  //  trans.show(new DirectionFragment());
-             //   }
-                   // trans.add(R.id.mapFrag,target,"direction");
-
-                   // trans.hide(source);
-                   // trans.show(target);
-                   // Log.d("target","target  is null");
-          //     }
-          //trans.replace(R.id.mapFrag, DirectionFragment.newInstance());
-           // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-           // trans.addToBackStack(null);
-            trans.commit();
-         //   searchButton.setVisibility(View.GONE);
+                trans.replace(R.id.your_placeholderMap, new DirectionFragment());
+                trans.addToBackStack( "stack_item");
+                trans.commit();
+                searchButton.setVisibility(View.GONE);
+                fb.setVisibility(View.GONE);
 
                 break;
         }
@@ -346,7 +315,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         if (getView() == null) {
             return;
         }
-        FloatingActionButton fb = getView().findViewById(R.id.showCurrentLocationButton);
+        fb = getView().findViewById(R.id.showCurrentLocationButton);
         fb.setOnClickListener(v -> {
           if (mapboxMap.getStyle() != null) {
                enableLocationComponent(mapboxMap.getStyle());

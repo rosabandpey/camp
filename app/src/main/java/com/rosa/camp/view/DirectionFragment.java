@@ -172,10 +172,10 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
                // trans.addToBackStack(null);
 
 
-              //  backToMapButton.setVisibility(View.GONE);
+                backToMapButton.setVisibility(View.GONE);
               //  hintLayout.setVisibility(View.GONE);
               //  directionResultLayout.setVisibility(View.VISIBLE);
-            //  directionResetButton.setVisibility(View.GONE);
+               //  directionResetButton.setVisibility(View.GONE);
                 break;
         }
     }

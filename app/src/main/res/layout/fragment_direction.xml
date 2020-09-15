@@ -23,7 +23,14 @@
         mapbox:mapbox_cameraTargetLng="51.4099"
         />
 
-
+        <Button
+            android:id="@+id/backToMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:gravity="right"
+            android:padding="8dp"
+            android:text="cancel"
+            tools:ignore="RtlHardcoded" />
     <LinearLayout
         android:id="@+id/search_results_linear_layout"
         android:layout_width="match_parent"
@@ -76,14 +83,7 @@
             android:layout_gravity="center"
             android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/backToMapButton"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:gravity="left"
-            android:padding="8dp"
-            android:text="cancel"
-            tools:ignore="RtlHardcoded" />
+
 
     </LinearLayout>
 
