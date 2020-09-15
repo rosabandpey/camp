@@ -132,50 +132,13 @@ public class DirectionFragment extends Fragment implements View.OnClickListener 
 
             case R.id.backToMapButton:
 
-
-                newInstance=MapFragment.newInstance();
-
-               // String backStateName =  newInstance().getClass().getName();
-                //String fragmentTag = backStateName;
-               // Fragment target = MapFragment.newInstance();
-               // Fragment source=DirectionFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
-               // DirectionFragment fragmentDemo = (DirectionFragment)
-                    //    getActivity().getSupportFragmentManager().findFragmentById(R.id.directionFragment);
-                      //  List<Fragment> frag =getActivity().getSupportFragmentManager().getFragments();
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-               // if(fragmentDemo.isAdded()) {
-
-               // }
-                    //  for(int i=0;i<frag.size();i++)
-                   //  {
-                    //   Log.d("list",String.valueOf(frag.size()));
-                    //    Fragment source=getActivity().getSupportFragmentManager().findFragmentById(R.id.directionFragment);
-
-                       // if (frag.get(i)==source) {
-
-                       //  }
-                   //    }
-                    //     trans.show(target);
-
-                    trans.replace(R.id.your_placeholderDirection, new MapFragment());
-               // trans.hide(fragmentDemo);
-                    //    Log.d("target","target  is added");
-                     trans.addToBackStack( "stack_item");
-
-              //  } else {
-                   // trans.addToBackStack( "stack_item");
-                //    trans.replace(R.id.directionFragment,target);
-             //   }
+                trans.replace(R.id.your_placeholderDirection, new MapFragment());
+                trans.addToBackStack( "stack_item");
                 trans.commit();
-               // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-               // trans.addToBackStack(null);
-
-
                 backToMapButton.setVisibility(View.GONE);
-              //  hintLayout.setVisibility(View.GONE);
-              //  directionResultLayout.setVisibility(View.VISIBLE);
-               //  directionResetButton.setVisibility(View.GONE);
+
                 break;
         }
     }

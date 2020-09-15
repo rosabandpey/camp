@@ -164,7 +164,6 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         switch (view.getId()) {
             case R.id.search_button1:
 
-                Fragment source=MapFragment.newInstance();
                 FragmentTransaction trans = getActivity().getSupportFragmentManager().beginTransaction();
                 trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 trans.replace(R.id.your_placeholderMap, new DirectionFragment());
