@@ -1,10 +1,17 @@
 package com.rosa.camp.viewModel;
 
+import android.content.Context;
+import android.util.Log;
+import android.view.View;
+
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.databinding.library.baseAdapters.BR;
-
+//import androidx.databinding.library.baseAdapters.BR;
+import com.rosa.ContextCamp;
+import com.rosa.camp.BR;
 import com.rosa.camp.model.Camp;
+import com.rosa.camp.repository.remote.PreferenceHelper;
+import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 
 public class CampViewModel extends BaseObservable {
 
@@ -25,9 +32,37 @@ public class CampViewModel extends BaseObservable {
     private boolean campDrinkingWater;
     private boolean campAllowpets;
     public Camp camp;
+    PrefernceHelperCamp preferenceHelper;
+    Context context;
 
     public CampViewModel (){
         camp=new Camp("","","","","",false,"",false,false,false,false,false,false,false,false);
+        context= ContextCamp.getAppContext();
+    }
+
+    public void onClick(View view){
+
+        registerCamp(context);
+    }
+
+    public void registerCamp(Context context) {
+        preferenceHelper = new PrefernceHelperCamp(context);
+        preferenceHelper.putNAME(getCampName());
+        preferenceHelper.putDescription(getCampDescription());
+        preferenceHelper.putAddress(getCampAddress());
+        preferenceHelper.putCITY(getCampCity());
+        preferenceHelper.putCOST(getCampCost());
+        preferenceHelper.putPARKING(isCampParking());
+        preferenceHelper.putRESTURAUNT(isCampResturant());
+        preferenceHelper.putSHOWERS(isCampShowers());
+        preferenceHelper.putGas(isCampGas());
+        preferenceHelper.putWC(isCampWc());
+        preferenceHelper.putWIFI(isCampWifi());
+        preferenceHelper.putWHEELCHAIRS(isCampWheelchairs());
+        preferenceHelper.putDRINKINGWATER(isCampDrinkingWater());
+        preferenceHelper.putALLOWPETS(isCampAllowpets());
+
+        Log.i("PreferenceHelper", getCampName());
     }
 
     @Bindable
@@ -37,7 +72,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampName(String campName) {
         camp.setName(campName);
-        notifyPropertyChanged(BR.);
+        notifyPropertyChanged(BR.campName);
     }
 
     @Bindable
@@ -47,6 +82,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampDescription(String campDescription) {
         camp.setDescription(campDescription);
+        notifyPropertyChanged(BR.campDescription);
     }
 
     @Bindable
@@ -56,6 +92,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampAddress(String campAddress) {
        camp.setAddress(campAddress);
+        notifyPropertyChanged(BR.campAddress);
     }
 
     @Bindable
@@ -65,6 +102,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampCity(String campCity) {
        camp.setCity(campCity);
+        notifyPropertyChanged(BR.campCity);
     }
 
     @Bindable
@@ -74,6 +112,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampTell(String campTell) {
         camp.setTell(campTell);
+        notifyPropertyChanged(BR.campTell);
     }
 
 
@@ -84,6 +123,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampParking(boolean campParking) {
         camp.setParking(campParking);
+        notifyPropertyChanged(BR.campParking);
     }
 
     @Bindable
@@ -93,6 +133,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampCost(String campCost) {
         camp.setCost(campCost);
+        notifyPropertyChanged(BR.campCost);
     }
 
     @Bindable
@@ -102,6 +143,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampShowers(boolean campShowers) {
         camp.setShowers(campShowers);
+        notifyPropertyChanged(BR.campShowers);
     }
 
     @Bindable
@@ -111,6 +153,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampGas(boolean campGas) {
         camp.setGas(campGas);
+        notifyPropertyChanged(BR.campGas);
     }
 
     @Bindable
@@ -120,6 +163,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampResturant(boolean campResturant) {
         camp.setResturant(campResturant);
+        notifyPropertyChanged(BR.campResturant);
     }
 
     @Bindable
@@ -129,6 +173,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampWc(boolean campWc) {
         camp.setWc(campWc);
+        notifyPropertyChanged(BR.campWc);
     }
 
     @Bindable
@@ -138,6 +183,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampWifi(boolean campWifi) {
         camp.setWifi(campWifi);
+        notifyPropertyChanged(BR.campWifi);
     }
 
     @Bindable
@@ -147,6 +193,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampWheelchairs(boolean campWheelchairs) {
         camp.setWheelchairs(campWheelchairs);
+        notifyPropertyChanged(BR.campWheelchairs);
     }
 
     @Bindable
@@ -156,6 +203,7 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampDrinkingWater(boolean campDrinkingWater) {
         camp.setDrinkingWater(campDrinkingWater);
+        notifyPropertyChanged(BR.campDrinkingWater);
     }
 
     @Bindable
@@ -165,5 +213,6 @@ public class CampViewModel extends BaseObservable {
 
     public void setCampAllowpets(boolean campAllowpets) {
         camp.setAllowpets(campAllowpets);
+        notifyPropertyChanged(BR.campAllowpets);
     }
 }

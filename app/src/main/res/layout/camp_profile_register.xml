@@ -12,12 +12,15 @@
             type="com.rosa.camp.viewModel.CampViewModel" />
 
     </data>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
     <androidx.gridlayout.widget.GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:columnCount="3"
-        app:rowCount="20"
+        app:rowCount="25"
         app:orientation="horizontal">
 
 
@@ -40,7 +43,7 @@
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="1"
-            app:srcCompat="@drawable/name" />
+            android:src="@drawable/iconcamping12"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/name"
@@ -71,13 +74,7 @@
             app:layout_columnSpan="3"
             />
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="50dp"
-            android:layout_height="62dp"
-            app:layout_column="2"
-            app:layout_row="1"
-            app:srcCompat="@drawable/name" />
+
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
@@ -105,7 +102,7 @@
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="3"
-            app:srcCompat="@drawable/name" />
+            app:srcCompat="@drawable/home2" />
 
         <View
             android:layout_width="match_parent"
@@ -142,7 +139,7 @@
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="5"
-            app:srcCompat="@drawable/birth" />
+            app:srcCompat="@drawable/phone" />
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
@@ -164,29 +161,20 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             app:layout_column="0"
-            app:layout_row="5"
+            app:layout_row="7"
             style="@style/personalInfo"
             app:layout_gravity="right"
             android:inputType="text"
             android:text="@={CampProfileViewModel.campDescription}"
             />
-        <RadioButton
-            android:id="@+id/radioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
 
-            app:layout_column="0"
-            app:layout_row="7"
-            app:layout_gravity="right"
-
-            />
         <ImageView
             android:id="@+id/imageView6"
             android:layout_width="50dp"
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="7"
-            app:srcCompat="@drawable/name" />
+            app:srcCompat="@drawable/description1" />
 
         <View
             android:layout_width="match_parent"
@@ -224,7 +212,7 @@
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="9"
-            app:srcCompat="@drawable/birth" />
+            app:srcCompat="@drawable/city" />
 
         <View
             android:layout_width="match_parent"
@@ -259,7 +247,7 @@
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="11"
-            app:srcCompat="@drawable/name" />
+            app:srcCompat="@drawable/price" />
 
         <View
             android:layout_width="match_parent"
@@ -279,23 +267,22 @@
             style="@style/personalInfo"
             />
 
-        <RadioButton
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/radioButtonParking"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:checked="@{CampProfileViewModel.campParking}"
             app:layout_column="0"
-            app:layout_row="13"
             app:layout_gravity="right"
+            app:layout_row="13" />
 
-            />
         <ImageView
             android:id="@+id/imageViewparking"
             android:layout_width="50dp"
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="13"
-            app:srcCompat="@drawable/name" />
+            app:srcCompat="@drawable/parking" />
 
         <View
             android:layout_width="match_parent"
@@ -305,10 +292,148 @@
             app:layout_columnSpan="3"
             />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="حمام"
+            app:layout_column="1"
+            app:layout_row="15"
+            style="@style/personalInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/radioButtonBath"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{CampProfileViewModel.campShowers}"
+            app:layout_column="0"
+            app:layout_row="15"
+            app:layout_gravity="right"
+
+            />
+        <ImageView
+            android:id="@+id/imageViewBath"
+            android:layout_width="50dp"
+            android:layout_height="62dp"
+            app:layout_column="2"
+            app:layout_row="15"
+            app:srcCompat="@drawable/shower" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/darker_gray"
+            app:layout_row="16"
+            app:layout_columnSpan="3"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="رستوران"
+            app:layout_column="1"
+            app:layout_row="17"
+            style="@style/personalInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/radioButtonRestaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{CampProfileViewModel.campResturant}"
+            app:layout_column="0"
+            app:layout_row="17"
+            app:layout_gravity="right"
+
+            />
+        <ImageView
+            android:id="@+id/imageViewRestaurant"
+            android:layout_width="50dp"
+            android:layout_height="62dp"
+            app:layout_column="2"
+            app:layout_row="17"
+            app:srcCompat="@drawable/plate" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/darker_gray"
+            app:layout_row="18"
+            app:layout_columnSpan="3"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="سرویس بهداشتی"
+            app:layout_column="1"
+            app:layout_row="19"
+            style="@style/personalInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/radioButtonwc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{CampProfileViewModel.campWc}"
+            app:layout_column="0"
+            app:layout_row="19"
+            app:layout_gravity="right"
+
+            />
+        <ImageView
+            android:id="@+id/imageViewwc"
+            android:layout_width="50dp"
+            android:layout_height="62dp"
+            app:layout_column="2"
+            app:layout_row="19"
+            app:srcCompat="@drawable/wc" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/darker_gray"
+            app:layout_row="20"
+            app:layout_columnSpan="3"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="اینترنت"
+            app:layout_column="1"
+            app:layout_row="21"
+            style="@style/personalInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/radioButtonInternet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_column="0"
+            app:layout_row="21"
+            app:layout_gravity="right"
+            android:checked="@{CampProfileViewModel.campWifi}"
+
+            />
+        <ImageView
+            android:id="@+id/imageViewInternet"
+            android:layout_width="50dp"
+            android:layout_height="62dp"
+            app:layout_column="2"
+            app:layout_row="21"
+            app:srcCompat="@drawable/wifi" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/darker_gray"
+            app:layout_row="22"
+            app:layout_columnSpan="3"
+            />
+
 
 
         <Button
-            app:layout_row="15"
+            app:layout_row="23"
             app:layout_columnSpan="2"
             app:layout_gravity="center_horizontal"
             android:text="@string/save"
@@ -318,7 +443,7 @@
 
 
     </androidx.gridlayout.widget.GridLayout>
-
+    </ScrollView>
 
 </layout>
 
