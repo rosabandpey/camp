@@ -1,9 +1,17 @@
 package com.rosa.camp.viewModel;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 //import androidx.databinding.library.baseAdapters.BR;
@@ -20,7 +28,6 @@ public class CampViewModel extends BaseObservable {
     private String campAddress;
     private String campCity;
     private String campTell;
-    private String campImage;
     private boolean campParking;
     private String campCost;
     private boolean campShowers;
@@ -34,6 +41,12 @@ public class CampViewModel extends BaseObservable {
     public Camp camp;
     PrefernceHelperCamp preferenceHelper;
     Context context;
+    private ImageView campImage;
+    private Uri campImageUri;
+
+
+
+
 
     public CampViewModel (){
         camp=new Camp("","","","","",false,"",false,false,false,false,false,false,false,false);
