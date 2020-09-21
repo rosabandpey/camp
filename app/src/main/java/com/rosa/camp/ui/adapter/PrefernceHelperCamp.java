@@ -20,6 +20,7 @@ public class PrefernceHelperCamp {
     private final String WHEELCHAIRS="wheelchairs";
     private final String DRINKINGWATER="drinkingWater";
     private final String ALLOWPETS="allowpets";
+    private  final String IMAGE="image";
 
     private SharedPreferences sharedPreferences;
     private Context context;
@@ -31,7 +32,17 @@ public class PrefernceHelperCamp {
         this.context = context;
     }
 
+    public void putIMAGE(String image){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString("image", image);
+        editor.commit();
 
+    }
+
+    public String getIMAGE(){
+
+        return sharedPreferences.getString(IMAGE,"");
+    }
 
     public void putNAME(String name){
         SharedPreferences.Editor editor=sharedPreferences.edit();

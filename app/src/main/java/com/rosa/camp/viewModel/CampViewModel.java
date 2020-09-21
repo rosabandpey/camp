@@ -1,7 +1,10 @@
 package com.rosa.camp.viewModel;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -20,16 +23,20 @@ import com.rosa.camp.BR;
 import com.rosa.camp.model.Camp;
 import com.rosa.camp.repository.remote.PreferenceHelper;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
+import com.rosa.camp.view.RegisterCampActivity;
 
-public class CampViewModel extends BaseObservable {
+import static com.google.android.material.internal.ContextUtils.getActivity;
+
+public class CampViewModel extends BaseObservable  {
 
     private String campName;
     private String campDescription;
     private String campAddress;
     private String campCity;
     private String campTell;
-    private boolean campParking;
+    private String campimg;
     private String campCost;
+    private boolean campParking;
     private boolean campShowers;
     private boolean campGas;
     private boolean campResturant;
@@ -41,25 +48,95 @@ public class CampViewModel extends BaseObservable {
     public Camp camp;
     PrefernceHelperCamp preferenceHelper;
     Context context;
-    private ImageView campImage;
-    private Uri campImageUri;
+    private ImageView cImage;
+    private Uri cImageUri;
+    RegisterCampActivity registerCampActivity;
+    private static final int PICK_IMAGE_REQUEST = 0;
+    protected RegisterCampActivity activity;
 
 
+
+   /* public void permissionsCheck() {
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            return;
+        }
+    } */
+
+
+    @SuppressLint("RestrictedApi")
+    public void imageSelect(View view) {
+       // permissionsCheck();
+        Intent intent;
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+        } else {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+        intent.setType("image/*");
+
+
+//
+        Activity host = (Activity) view.getContext();
+        Log.i("getActivity", host.toString());
+        //getActivity(context).startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        host.startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == PICK_IMAGE_REQUEST) {
+            // Make sure the request was successful
+        //   if (resultCode == RESULT_OK) {
+                // The user picked a image.
+                // The Intent's data Uri identifies which item was selected.
+                if (data != null) {
+
+                    // This is the key line item, URI specifies the name of the data
+                   // cImageUri = data.getData();
+                    setCampimg(data.getData().toString());
+                    // Saves image URI as string to Default Shared Preferences
+
+
+
+
+                    // Sets the ImageView with the Image URI
+                   // cImage.setImageURI(cImageUri);
+                   // cImage.invalidate();
+                }
+          //  }
+        }
+    }
 
 
 
     public CampViewModel (){
-        camp=new Camp("","","","","",false,"",false,false,false,false,false,false,false,false);
+        camp=new Camp("","","","","","",false,"",false,false,false,false,false,false,false,false);
         context= ContextCamp.getAppContext();
+        preferenceHelper = new PrefernceHelperCamp(context);
+
     }
 
     public void onClick(View view){
 
         registerCamp(context);
+
+    }
+
+    public void onClicked(View view){
+
+    imageSelect(view);
+
     }
 
     public void registerCamp(Context context) {
-        preferenceHelper = new PrefernceHelperCamp(context);
+
         preferenceHelper.putNAME(getCampName());
         preferenceHelper.putDescription(getCampDescription());
         preferenceHelper.putAddress(getCampAddress());
@@ -74,9 +151,20 @@ public class CampViewModel extends BaseObservable {
         preferenceHelper.putWHEELCHAIRS(isCampWheelchairs());
         preferenceHelper.putDRINKINGWATER(isCampDrinkingWater());
         preferenceHelper.putALLOWPETS(isCampAllowpets());
-
-        Log.i("PreferenceHelper", getCampName());
+        preferenceHelper.putIMAGE(getCampimg());
+        Log.i("PreferenceHelper", getCampimg());
     }
+
+    @Bindable
+    public String getCampimg() {
+        return camp.getImage();
+    }
+
+    public void setCampimg(String campimg) {
+        camp.setImage(campimg);
+        notifyPropertyChanged(BR.campimg);
+    }
+
 
     @Bindable
     public String getCampName() {

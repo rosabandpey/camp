@@ -25,6 +25,7 @@ public class Camp {
             , String address
             , String city
             , String tell
+                ,String image
             , boolean parking
             , String cost
             , boolean showers
@@ -40,6 +41,7 @@ public class Camp {
         this.city=city;
         this.cost=cost;
         this.tell=tell;
+        this.image=image;
         this.parking=parking;
         this.showers=showers;
         this.gas=gas;
@@ -49,6 +51,14 @@ public class Camp {
         this.allowpets=allowpets;
         this.wheelchairs=wheelchairs;
         this.drinkingWater=drinkingWater;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getName() {

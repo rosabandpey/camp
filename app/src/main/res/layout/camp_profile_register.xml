@@ -366,6 +366,8 @@
             android:checked="@{CampProfileViewModel.campWifi}"
 
             />
+
+
         <ImageView
             android:id="@+id/imageViewInternet"
             android:layout_width="50dp"
@@ -375,11 +377,12 @@
             app:srcCompat="@drawable/wifi" />
 
         <ImageView
-            android:id="@+id/imageViewImage"
+            android:id="@+id/imageViewCamp"
             android:layout_width="50dp"
             android:layout_height="62dp"
             app:layout_column="2"
             app:layout_row="17"
+            android:src="@{CampProfileViewModel.campimg}"
              />
 
         <View
@@ -392,7 +395,7 @@
 
         <Button
             app:layout_row="19"
-
+            android:id="@+id/saveButton"
             app:layout_gravity="center_horizontal"
             android:text="@string/save"
             android:onClick="@{(v)-> CampProfileViewModel.onClick(v)}"
@@ -402,10 +405,10 @@
 
         <Button
             app:layout_row="19"
-
+            android:id="@+id/imageButton"
             app:layout_gravity="center_horizontal"
             android:text="انتخاب تصاویر"
-            android:onClick="@{(v)-> CampProfileViewModel.onClick(v)}"
+            android:onClick="@{(v)-> CampProfileViewModel.onClicked(v)}"
             >
         </Button>
 
