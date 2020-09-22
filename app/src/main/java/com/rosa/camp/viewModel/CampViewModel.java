@@ -1,31 +1,24 @@
 package com.rosa.camp.viewModel;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 //import androidx.databinding.library.baseAdapters.BR;
 import com.rosa.ContextCamp;
 import com.rosa.camp.BR;
 import com.rosa.camp.model.Camp;
-import com.rosa.camp.repository.remote.PreferenceHelper;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
+import com.rosa.camp.view.MapActivity;
 import com.rosa.camp.view.RegisterCampActivity;
-
-import static com.google.android.material.internal.ContextUtils.getActivity;
 
 public class CampViewModel extends BaseObservable  {
 
@@ -50,9 +43,9 @@ public class CampViewModel extends BaseObservable  {
     Context context;
     private ImageView cImage;
     private Uri cImageUri;
-    RegisterCampActivity registerCampActivity;
     private static final int PICK_IMAGE_REQUEST = 0;
     protected RegisterCampActivity activity;
+    Activity host;
 
 
 
@@ -81,9 +74,8 @@ public class CampViewModel extends BaseObservable  {
 
 
 //
-        Activity host = (Activity) view.getContext();
+        host = (Activity) view.getContext();
         Log.i("getActivity", host.toString());
-        //getActivity(context).startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
         host.startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
@@ -93,7 +85,7 @@ public class CampViewModel extends BaseObservable  {
         // Check which request we're responding to
         if (requestCode == PICK_IMAGE_REQUEST) {
             // Make sure the request was successful
-        //   if (resultCode == RESULT_OK) {
+         //  if (resultCode == RESULT_OK) {
                 // The user picked a image.
                 // The Intent's data Uri identifies which item was selected.
                 if (data != null) {
@@ -103,14 +95,8 @@ public class CampViewModel extends BaseObservable  {
                     setCampimg(data.getData().toString());
                     // Saves image URI as string to Default Shared Preferences
 
-
-
-
-                    // Sets the ImageView with the Image URI
-                   // cImage.setImageURI(cImageUri);
-                   // cImage.invalidate();
                 }
-          //  }
+       //     }
         }
     }
 
@@ -132,6 +118,19 @@ public class CampViewModel extends BaseObservable  {
     public void onClicked(View view){
 
     imageSelect(view);
+
+    }
+
+    public void onClickAddress(View view){
+
+       /* FragmentTransaction trans =((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+        trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        trans.replace(R.id.frameLayoutmap, new MapFragment());
+        trans.addToBackStack( "stack_item");
+        trans.commit(); */
+        host = (Activity) view.getContext();
+        Intent i = new Intent(host, MapActivity.class);
+        host.startActivity(i);
 
     }
 

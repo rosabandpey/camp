@@ -30,11 +30,8 @@ public class RegisterCampActivity extends AppCompatActivity {
         viewModel=new CampViewModel();
         campProfileRegisterBinding.setCampProfileViewModel(viewModel);
         campProfileRegisterBinding.executePendingBindings();
-        //imageSelect();
 
     }
-
-
 
 
 
