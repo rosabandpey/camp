@@ -1,5 +1,7 @@
 package com.rosa.camp.ui.adapter;
 
+import android.app.Activity;
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rosa.camp.R;
@@ -109,8 +113,8 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
         @Override
         public void onClick(View v) {
 
-                HomeActivity homeActivity = (HomeActivity) v.getContext();
-                List<Fragment> fragments = homeActivity.getSupportFragmentManager().getFragments();
+                Context context =  v.getContext();
+                List<Fragment> fragments  =((AppCompatActivity) context).getSupportFragmentManager().getFragments();
                 ArrayList<Fragment> visibleFragments = new ArrayList<>();
                 if (fragments != null) {
                     for (Fragment fragment : fragments) {

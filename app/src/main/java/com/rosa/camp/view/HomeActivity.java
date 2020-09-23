@@ -44,8 +44,6 @@ public class HomeActivity extends AppCompatActivity  {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tabLayout= findViewById(R.id.tab_layout);
         viewPager= findViewById(R.id.view_pager);
-        instance=MapFragment.newInstance();
-        dInstance=DirectionFragment.newInstance();
         adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
         adapter.addFrag(new MapFragment(),"Map");

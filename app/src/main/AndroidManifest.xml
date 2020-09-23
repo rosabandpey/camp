@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.MapActivity"></activity>
+        <activity android:name=".view.AddressActivity"></activity>
+        <activity android:name=".view.MapActivity" />
         <activity
             android:name=".view.SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -35,7 +36,6 @@
         <activity android:name=".view.GoogleSignInActivity" />
         <activity android:name=".view.MainActivity" />
         <activity android:name=".view.RegisterCampActivity" />
-
     </application>
 
 </manifest>

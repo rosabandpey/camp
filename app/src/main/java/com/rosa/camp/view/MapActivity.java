@@ -22,6 +22,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frameLayoutmap, new MapFragment()).commit();

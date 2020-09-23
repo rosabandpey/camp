@@ -1,5 +1,6 @@
 package com.rosa.camp.view;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
@@ -21,15 +22,17 @@ public class RegisterCampActivity extends AppCompatActivity {
     private CampViewModel viewModel;
     private static final int PICK_IMAGE_REQUEST = 0;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         CampProfileRegisterBinding  campProfileRegisterBinding = DataBindingUtil.setContentView(this, R.layout.camp_profile_register);
         viewModel=new CampViewModel();
         campProfileRegisterBinding.setCampProfileViewModel(viewModel);
         campProfileRegisterBinding.executePendingBindings();
+
+
 
     }
 
