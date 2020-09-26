@@ -17,6 +17,7 @@ import com.rosa.ContextCamp;
 import com.rosa.camp.BR;
 import com.rosa.camp.model.Camp;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
+import com.rosa.camp.view.AddressActivity;
 import com.rosa.camp.view.MapActivity;
 import com.rosa.camp.view.RegisterCampActivity;
 
@@ -129,7 +130,7 @@ public class CampViewModel extends BaseObservable  {
         trans.addToBackStack( "stack_item");
         trans.commit(); */
         host = (Activity) view.getContext();
-        Intent i = new Intent(host, MapActivity.class);
+        Intent i = new Intent(host, AddressActivity.class);
         host.startActivity(i);
 
     }

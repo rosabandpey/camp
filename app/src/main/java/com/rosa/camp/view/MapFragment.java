@@ -542,6 +542,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
 

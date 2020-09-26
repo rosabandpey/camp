@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rosa.camp.R;
+import com.rosa.camp.view.AddressActivity;
 import com.rosa.camp.view.DirectionFragment;
 import com.rosa.camp.view.HomeActivity;
 import com.rosa.camp.view.LoginFragment;
@@ -139,8 +140,19 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
 
                             Log.d("frag","no frag");
                         }
+
                     }
                 }
+            Activity  host=(Activity) v.getContext();
+            if (host instanceof AddressActivity) {
+                AddressActivity fgf = (AddressActivity) host;
+
+                fgf.showItemOnMap(mItem);
+            }
+            else {
+
+                Log.d("activity","no activity");
+            }
         }
     }
 

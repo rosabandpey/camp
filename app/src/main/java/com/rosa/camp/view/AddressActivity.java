@@ -1,16 +1,20 @@
 package com.rosa.camp.view;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,6 +41,7 @@ import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
@@ -57,6 +62,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
 import com.rosa.camp.ui.adapter.SearchViewAdapter;
+import com.rosa.camp.ui.adapter.SearchViewAdapterForActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -74,7 +80,7 @@ import ir.map.servicesdk.response.SearchResponse;
 
 import static android.os.Looper.getMainLooper;
 
-public class AddressActivity extends AppCompatActivity {
+public class AddressActivity extends AppCompatActivity  {
 
 
     boolean mIsVisibleToUser;
@@ -86,14 +92,14 @@ public class AddressActivity extends AppCompatActivity {
     private TextView mTextView;
     private LocationEngine locationEngine = null;
     private SearchView mSearchView;
-    private SearchViewAdapter mRecyclerAdapter;
+    private SearchViewAdapterForActivity mRecyclerAdapter;
     private RecyclerView mRecyclerView;
     private AddressActivity.State state = AddressActivity.State.MAP;
     public Button searchButton;
     FloatingActionButton fb;
     private CircleManager circleManager;
     private LinearLayout mLinearLayout;
-    private AddressActivity.MapFragmentLocationCallback callback = new AddressActivity().MapFragmentLocationCallback(this);
+    private AddressActivity.MapFragmentLocationCallback callback = new MapFragmentLocationCallback(this);
     private PermissionsManager permissionsManager;
     private MapService mapService = new MapService();
     public final static LatLng VANAK_SQUARE=new LatLng(35.7572,51.4099);
@@ -102,6 +108,9 @@ public class AddressActivity extends AppCompatActivity {
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
     private final int REQUEST_LOCATION_PERMISSION = 1;
+    Activity activity;
+    Toolbar mtoolbar;
+
 
     private enum State {
         MAP,
@@ -142,9 +151,10 @@ public class AddressActivity extends AppCompatActivity {
         sProgressBar = findViewById(R.id.search_progress_bar);
         mapView = findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-        searchButton = findViewById(R.id.search_button1);
-        searchButton.setOnClickListener(this);
-        searchButton.setVisibility(View.VISIBLE);
+        mtoolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(mtoolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         statusCheck();
 
         //Installing Map
@@ -186,7 +196,6 @@ public class AddressActivity extends AppCompatActivity {
                 mapboxMap.addOnCameraIdleListener(() -> reverseGeocode(mapboxMap.getCameraPosition().target));
 
 
-
                 //Set a touch event listener on the map
                 mapboxMap.addOnMapClickListener(point -> {
                     addMarkerToMapViewAtPosition(point);
@@ -202,9 +211,9 @@ public class AddressActivity extends AppCompatActivity {
         //Searching
         mRecyclerView = findViewById(R.id.recyclerView);
         mLinearLayout = findViewById(R.id.search_results_linear_layout);
-        mProgressBar =  findViewById(R.id.reverse_geocode_progressBar);
-
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
+        mProgressBar = findViewById(R.id.reverse_geocode_progressBar);
+        activity= (Activity) this;
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(activity);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), mLinearLayoutManager.getOrientation());
@@ -213,13 +222,15 @@ public class AddressActivity extends AppCompatActivity {
         mapView.setFocusableInTouchMode(true);
         mapView.requestFocus();
         mapView.setOnKeyListener((v, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP && state == AddressActivity.State.MAP_PIN) {
-                setState(AddressActivity.State.RESULTS);
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP && state == State.MAP_PIN) {
+                setState(State.RESULTS);
                 return true;
             }
             return false;
         });
+
     }
+
 
 
     private void animateToCoordinate(LatLng coordinate) {
@@ -232,11 +243,12 @@ public class AddressActivity extends AppCompatActivity {
 
     @SuppressWarnings({"MissingPermission"})
     private void initializeLocationEngine() {
-        if (this == null) {
+        activity= (Activity) this;
+        if (activity == null) {
             return;
         }
 
-        locationEngine = LocationEngineProvider.getBestLocationEngine(this);
+        locationEngine = LocationEngineProvider.getBestLocationEngine(activity);
 
         long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
         long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
@@ -272,7 +284,8 @@ public class AddressActivity extends AppCompatActivity {
 
     @SuppressWarnings({"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
-        if (this == null) {
+        activity= (Activity) this;
+        if (activity == null) {
             return;
         }
 
@@ -282,7 +295,7 @@ public class AddressActivity extends AppCompatActivity {
         LocationComponent locationComponent = mapboxMap.getLocationComponent();
 
         LocationComponentActivationOptions locationComponentActivationOptions =
-                LocationComponentActivationOptions.builder(this, loadedMapStyle)
+                LocationComponentActivationOptions.builder(activity, loadedMapStyle)
                         .useDefaultLocationEngine(true)
                         .build();
 
@@ -425,16 +438,16 @@ public class AddressActivity extends AppCompatActivity {
 
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.search_view_menu_item, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        getMenuInflater().inflate(R.menu.search_view_menu_item, menu);
+        return  true;
     }
 
     @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
 
         if (menu.findItem(R.id.action_search) == null) {
-            return;
+            return false;
         }
         final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setIconifiedByDefault(false);
@@ -443,12 +456,12 @@ public class AddressActivity extends AppCompatActivity {
         mSearchView = searchView;
 
         searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && state == AddressActivity.State.MAP_PIN) {
+            if (hasFocus && state == State.MAP_PIN) {
                 circleManager.deleteAll();
                 if (!TextUtils.isEmpty(searchView.getQuery())) {
-                    setState(AddressActivity.State.RESULTS);
+                    setState(State.RESULTS);
                 } else {
-                    setState(AddressActivity.State.MAP);
+                    setState(State.MAP);
                 }
             }
         });
@@ -464,9 +477,9 @@ public class AddressActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(newText)) {
                     circleManager.deleteAll();
-                    setState(AddressActivity.State.MAP);
+                    setState(State.MAP);
                 } else {
-                    setState(AddressActivity.State.SEARCHING);
+                    setState(State.SEARCHING);
                     LatLng mapTargetLat=mapboxMap.getCameraPosition().target;
                     SearchRequest requestBody = new SearchRequest.Builder(newText)
 
@@ -483,10 +496,10 @@ public class AddressActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(SearchResponse response) {
                             Toast.makeText(getApplicationContext(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
-                            setState(AddressActivity.State.RESULTS);
+                            setState(State.RESULTS);
                             if (response.getCount() > 0 && newText.equals(mSearchView.getQuery().toString())) {
 
-                                mRecyclerAdapter = new SearchViewAdapter(response.getSearchItems());
+                                mRecyclerAdapter = new SearchViewAdapterForActivity(response.getSearchItems());
                                 mRecyclerView.setAdapter(mRecyclerAdapter);
                             }
                         }
@@ -503,6 +516,7 @@ public class AddressActivity extends AppCompatActivity {
         });
 
         super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -515,16 +529,17 @@ public class AddressActivity extends AppCompatActivity {
 
     public void showItemOnMap(final SearchItem item) {
         Log.d("onclick","view clicked");
-        setState(AddressActivity.State.MAP_PIN);
-        if (this == null || item.getGeom().getCoordinates() == null) {
+        setState(State.MAP_PIN);
+        activity= (Activity) this;
+        if (activity == null || item.getGeom().getCoordinates() == null) {
             return;
         }
 
         circleManager.deleteAll();
         mSearchView.clearFocus();
 
-        int color = ContextCompat.getColor(this, R.color.colorPrimary);
-        int strokeColor = ContextCompat.getColor(getApplicationContext(), R.color.colorAccent);
+        int color = ContextCompat.getColor(activity, R.color.colorPrimary);
+        int strokeColor = ContextCompat.getColor(activity, R.color.colorAccent);
         double longitude = item.getGeom().getLongitude();
         double latitude = item.getGeom().getLatitude();
 
@@ -554,12 +569,12 @@ public class AddressActivity extends AppCompatActivity {
 
 
 
-    @Override
+
     public void onExplanationNeeded(List<String> permissionsToExplain) {
         Toast.makeText(getApplicationContext(), "برای عملکرد این ویژگی به موقعیت مکانی نیاز است", Toast.LENGTH_LONG).show();
     }
 
-    @Override
+
     public void onPermissionResult(boolean granted) {
         if (granted) {
             if (mapboxMap.getStyle() != null) {
@@ -574,10 +589,10 @@ public class AddressActivity extends AppCompatActivity {
 
     private static class MapFragmentLocationCallback implements LocationEngineCallback<LocationEngineResult> {
 
-        private WeakReference<MapFragment> fragmentWeakReference;
+        private WeakReference<AddressActivity> fragmentWeakReference;
 
-        MapFragmentLocationCallback(MapFragment fragment) {
-            fragmentWeakReference = new WeakReference<>(fragment);
+        MapFragmentLocationCallback(AddressActivity addressActivity) {
+            fragmentWeakReference = new WeakReference(addressActivity);
         }
 
         /* The LocationEngineCallback interface's method which fires when the device's location has changed.
@@ -586,9 +601,9 @@ public class AddressActivity extends AppCompatActivity {
          */
         @Override
         public void onSuccess(LocationEngineResult result) {
-            MapFragment fragment = fragmentWeakReference.get();
+            AddressActivity addressActivity = fragmentWeakReference.get();
 
-            if (fragment != null) {
+            if (addressActivity != null) {
                 Location location = result.getLastLocation();
                 Log.d("location","location is recieved");
 
@@ -598,8 +613,8 @@ public class AddressActivity extends AppCompatActivity {
 
                 }
 
-                if (fragment.mapboxMap != null && result.getLastLocation() != null) {
-                    fragment.mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                if (addressActivity.mapboxMap != null && result.getLastLocation() != null) {
+                    addressActivity.mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
                 }
             }
         }
@@ -612,6 +627,51 @@ public class AddressActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    @SuppressWarnings({"MissingPermission"})
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+
+
+
 
 
 }
