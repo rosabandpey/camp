@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.rosa.camp.R;
 import com.rosa.camp.databinding.CampProfileRegisterBinding;
@@ -31,6 +32,24 @@ public class RegisterCampActivity extends AppCompatActivity {
         viewModel=new CampViewModel();
         campProfileRegisterBinding.setCampProfileViewModel(viewModel);
         campProfileRegisterBinding.executePendingBindings();
+
+
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            return;
+        }
+// get data via the key
+        Double latitude = extras.getDouble("latitude",0);
+        Double longtitude = extras.getDouble("Longtitude",0);
+
+        if (latitude != null) {
+            // do something with the data
+            Log.d("latitude",latitude.toString());
+        }
+        if (longtitude != null) {
+            // do something with the data
+            Log.d("Longtitude",longtitude.toString());
+        }
 
 
 

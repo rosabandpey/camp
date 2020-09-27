@@ -36,7 +36,12 @@
             android:visibility="visible"
             />
 
-
+    <Button
+        android:id="@+id/approveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="تایید"/>
 
         <LinearLayout
             android:id="@+id/search_results_linear_layout"
@@ -61,6 +66,8 @@
                 android:scrollbars="vertical"
                 android:id="@+id/recyclerView"
                 android:visibility="gone"/>
+
+
 
         </LinearLayout>
 

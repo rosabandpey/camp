@@ -80,7 +80,7 @@ import ir.map.servicesdk.response.SearchResponse;
 
 import static android.os.Looper.getMainLooper;
 
-public class AddressActivity extends AppCompatActivity  {
+public class AddressActivity extends AppCompatActivity  implements View.OnClickListener {
 
 
     boolean mIsVisibleToUser;
@@ -108,8 +108,22 @@ public class AddressActivity extends AppCompatActivity  {
     private static final String MARKERS_LAYER = "markers-layer";
     private static final String MARKER_ICON_ID = "marker-icon-id";
     private final int REQUEST_LOCATION_PERMISSION = 1;
+    Button approveButton;
     Activity activity;
     Toolbar mtoolbar;
+    LatLng address;
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId()==R.id.approveButton){
+
+            Intent i = new Intent(this, RegisterCampActivity.class);
+            i.putExtra("latitude",address.getLatitude());
+            i.putExtra("Longtitude",address.getLongitude());
+            startActivity(i);
+
+        }
+    }
 
 
     private enum State {
@@ -144,7 +158,8 @@ public class AddressActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_address);
-
+        approveButton=findViewById(R.id.approveButton);
+        approveButton.setOnClickListener(this);
         mTextView = findViewById(R.id.reverse_geocode_textView);
         mTextView.setText("");
         mProgressBar = findViewById(R.id.reverse_geocode_progressBar);
@@ -199,6 +214,8 @@ public class AddressActivity extends AppCompatActivity  {
                 //Set a touch event listener on the map
                 mapboxMap.addOnMapClickListener(point -> {
                     addMarkerToMapViewAtPosition(point);
+                    address=point;
+
                     return true;
 
                 });
@@ -480,7 +497,9 @@ public class AddressActivity extends AppCompatActivity  {
                     setState(State.MAP);
                 } else {
                     setState(State.SEARCHING);
+
                     LatLng mapTargetLat=mapboxMap.getCameraPosition().target;
+                    address=mapTargetLat;
                     SearchRequest requestBody = new SearchRequest.Builder(newText)
 
                             .select(SelectOptions.POI)
