@@ -34,22 +34,7 @@ public class RegisterCampActivity extends AppCompatActivity {
         campProfileRegisterBinding.executePendingBindings();
 
 
-        Bundle extras = getIntent().getExtras();
-        if (extras == null) {
-            return;
-        }
-// get data via the key
-        Double latitude = extras.getDouble("latitude",0);
-        Double longtitude = extras.getDouble("Longtitude",0);
 
-        if (latitude != null) {
-            // do something with the data
-            Log.d("latitude",latitude.toString());
-        }
-        if (longtitude != null) {
-            // do something with the data
-            Log.d("Longtitude",longtitude.toString());
-        }
 
 
 

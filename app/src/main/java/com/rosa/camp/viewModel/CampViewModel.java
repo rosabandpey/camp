@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -45,6 +46,7 @@ public class CampViewModel extends BaseObservable  {
     private ImageView cImage;
     private Uri cImageUri;
     private static final int PICK_IMAGE_REQUEST = 0;
+    private static final int LAUNCH_SECOND_ACTIVITY=1;
     protected RegisterCampActivity activity;
     Activity host;
 
@@ -98,6 +100,27 @@ public class CampViewModel extends BaseObservable  {
 
                 }
        //     }
+        }
+        Log.d("Longtitude", String.valueOf(requestCode));
+        if (requestCode == LAUNCH_SECOND_ACTIVITY) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras == null) {
+                    return;
+                }
+// get data via the key
+                Double latitude = extras.getDouble("latitude", 0);
+                Double longtitude = extras.getDouble("Longtitude", 0);
+
+                if (latitude != null) {
+                    // do something with the data
+                    Log.d("latitude", latitude.toString());
+                }
+                if (longtitude != null) {
+                    // do something with the data
+                    Log.d("Longtitude", longtitude.toString());
+                }
+            }
         }
     }
 

@@ -112,6 +112,8 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
     Activity activity;
     Toolbar mtoolbar;
     LatLng address;
+    LatLng mapTargetLat;
+    private static final int LAUNCH_SECOND_ACTIVITY=1;
 
     @Override
     public void onClick(View view) {
@@ -120,7 +122,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
             Intent i = new Intent(this, RegisterCampActivity.class);
             i.putExtra("latitude",address.getLatitude());
             i.putExtra("Longtitude",address.getLongitude());
-            startActivity(i);
+            startActivityForResult(i,LAUNCH_SECOND_ACTIVITY);
 
         }
     }
@@ -498,8 +500,13 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
                 } else {
                     setState(State.SEARCHING);
 
-                    LatLng mapTargetLat=mapboxMap.getCameraPosition().target;
-                    address=mapTargetLat;
+                    mapTargetLat=mapboxMap.getCameraPosition().target;
+
+
+
+
+
+
                     SearchRequest requestBody = new SearchRequest.Builder(newText)
 
                             .select(SelectOptions.POI)
@@ -516,6 +523,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
                         public void onSuccess(SearchResponse response) {
                             Toast.makeText(getApplicationContext(), "پاسخ جستجو دریافت شد", Toast.LENGTH_SHORT).show();
                             setState(State.RESULTS);
+
                             if (response.getCount() > 0 && newText.equals(mSearchView.getQuery().toString())) {
 
                                 mRecyclerAdapter = new SearchViewAdapterForActivity(response.getSearchItems());
@@ -563,6 +571,8 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
         double latitude = item.getGeom().getLatitude();
 
         LatLng latLng2=new LatLng(latitude,longitude);
+        addMarkerToMapViewAtPosition(latLng2);
+        address=latLng2;
         CircleOptions circleOptions = new CircleOptions()
 
                 .withLatLng(latLng2)
