@@ -113,7 +113,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
     Toolbar mtoolbar;
     LatLng address;
     LatLng mapTargetLat;
-    private static final int LAUNCH_SECOND_ACTIVITY=1;
+    private static final int LAUNCH_ADDRESS_ACTIVITY=1;
 
     @Override
     public void onClick(View view) {
@@ -122,7 +122,8 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
             Intent i = new Intent(this, RegisterCampActivity.class);
             i.putExtra("latitude",address.getLatitude());
             i.putExtra("Longtitude",address.getLongitude());
-            startActivityForResult(i,LAUNCH_SECOND_ACTIVITY);
+            setResult(LAUNCH_ADDRESS_ACTIVITY,i);
+            finish();
 
         }
     }

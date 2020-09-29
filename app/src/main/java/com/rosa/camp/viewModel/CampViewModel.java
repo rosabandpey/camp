@@ -46,7 +46,7 @@ public class CampViewModel extends BaseObservable  {
     private ImageView cImage;
     private Uri cImageUri;
     private static final int PICK_IMAGE_REQUEST = 0;
-    private static final int LAUNCH_SECOND_ACTIVITY=1;
+    private static final int LAUNCH_ADDRESS_ACTIVITY=1;
     protected RegisterCampActivity activity;
     Activity host;
 
@@ -102,7 +102,7 @@ public class CampViewModel extends BaseObservable  {
        //     }
         }
         Log.d("Longtitude", String.valueOf(requestCode));
-        if (requestCode == LAUNCH_SECOND_ACTIVITY) {
+        if (requestCode == LAUNCH_ADDRESS_ACTIVITY) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras == null) {
@@ -154,7 +154,7 @@ public class CampViewModel extends BaseObservable  {
         trans.commit(); */
         host = (Activity) view.getContext();
         Intent i = new Intent(host, AddressActivity.class);
-        host.startActivity(i);
+        host.startActivityForResult(i,LAUNCH_ADDRESS_ACTIVITY);
 
     }
 
