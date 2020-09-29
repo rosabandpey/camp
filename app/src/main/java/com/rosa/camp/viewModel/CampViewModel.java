@@ -26,6 +26,8 @@ public class CampViewModel extends BaseObservable  {
 
     private String campName;
     private String campDescription;
+    private double campAddressLatitude;
+    private double campAddressLongtitude;
     private String campAddress;
     private String campCity;
     private String campTell;
@@ -87,8 +89,7 @@ public class CampViewModel extends BaseObservable  {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == PICK_IMAGE_REQUEST) {
-            // Make sure the request was successful
-         //  if (resultCode == RESULT_OK) {
+
                 // The user picked a image.
                 // The Intent's data Uri identifies which item was selected.
                 if (data != null) {
@@ -111,14 +112,22 @@ public class CampViewModel extends BaseObservable  {
 // get data via the key
                 Double latitude = extras.getDouble("latitude", 0);
                 Double longtitude = extras.getDouble("Longtitude", 0);
+                String address=extras.getString("addressDescription","");
 
                 if (latitude != null) {
                     // do something with the data
                     Log.d("latitude", latitude.toString());
+                    setCampAddressLatitude(latitude);
                 }
                 if (longtitude != null) {
                     // do something with the data
                     Log.d("Longtitude", longtitude.toString());
+                    setCampAddressLongtitude(longtitude);
+                }
+                if (address != null) {
+                    // do something with the data
+                    Log.d("address", address);
+                    setCampAddress(address);
                 }
             }
         }
@@ -127,31 +136,26 @@ public class CampViewModel extends BaseObservable  {
 
 
     public CampViewModel (){
-        camp=new Camp("","","","","","",false,"",false,false,false,false,false,false,false,false);
+        camp=new Camp("","","",0,0,"","","false","",false,false,false,false,false,false,false,false,false);
         context= ContextCamp.getAppContext();
         preferenceHelper = new PrefernceHelperCamp(context);
 
     }
 
-    public void onClick(View view){
+    public void saveButton(View view){
 
         registerCamp(context);
 
     }
 
-    public void onClicked(View view){
+    public void imageSelectButton(View view){
 
     imageSelect(view);
 
     }
 
-    public void onClickAddress(View view){
+    public void selectAddress(View view){
 
-       /* FragmentTransaction trans =((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
-        trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        trans.replace(R.id.frameLayoutmap, new MapFragment());
-        trans.addToBackStack( "stack_item");
-        trans.commit(); */
         host = (Activity) view.getContext();
         Intent i = new Intent(host, AddressActivity.class);
         host.startActivityForResult(i,LAUNCH_ADDRESS_ACTIVITY);
@@ -162,7 +166,9 @@ public class CampViewModel extends BaseObservable  {
 
         preferenceHelper.putNAME(getCampName());
         preferenceHelper.putDescription(getCampDescription());
-        preferenceHelper.putAddress(getCampAddress());
+        preferenceHelper.putADDRESS(getCampAddress());
+        preferenceHelper.putAddressLatitude(getCampAddressLatitude());
+        preferenceHelper.putAddressLongtitude(getCampAddressLongtitude());
         preferenceHelper.putCITY(getCampCity());
         preferenceHelper.putCOST(getCampCost());
         preferenceHelper.putPARKING(isCampParking());
@@ -175,6 +181,7 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putDRINKINGWATER(isCampDrinkingWater());
         preferenceHelper.putALLOWPETS(isCampAllowpets());
         preferenceHelper.putIMAGE(getCampimg());
+
         Log.i("PreferenceHelper", getCampimg());
     }
 
@@ -215,9 +222,28 @@ public class CampViewModel extends BaseObservable  {
     }
 
     public void setCampAddress(String campAddress) {
-       camp.setAddress(campAddress);
+        camp.setAddress(campAddress);
         notifyPropertyChanged(BR.campAddress);
     }
+
+    @Bindable
+    public double getCampAddressLatitude() {
+        return camp.getAddressLatitude();
+    }
+
+    public void setCampAddressLatitude(double campAddressLatitude) {
+        camp.setAddressLatitude(campAddressLatitude);
+    }
+
+    @Bindable
+    public double getCampAddressLongtitude() {
+        return camp.getAddressLongtitude();
+    }
+
+    public void setCampAddressLongtitude(double campAddressLongtitude) {
+        camp.setAddressLongtitude(campAddressLongtitude);
+    }
+
 
     @Bindable
     public String getCampCity() {

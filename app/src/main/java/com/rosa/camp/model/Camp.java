@@ -6,6 +6,8 @@ public class Camp {
     private String name;
     private String description;
     private String address;
+    private double addressLatitude;
+    private double addressLongtitude;
     private String city;
     private String tell;
     private String image;
@@ -21,13 +23,15 @@ public class Camp {
     private boolean allowpets;
 
     public Camp(String name
-            ,String description
+            , String description
             , String address
+            , double addressLatitude
+            , double addressLongtitude
             , String city
             , String tell
-                ,String image
-            , boolean parking
+            , String image
             , String cost
+            , boolean parking
             , boolean showers
             , boolean gas
             , boolean resturant
@@ -37,7 +41,10 @@ public class Camp {
             , boolean drinkingWater
             , boolean allowpets){
         this.name=name;
+        this.description=description;
         this.address=address;
+        this.addressLatitude=addressLatitude;
+        this.addressLongtitude=addressLongtitude;
         this.city=city;
         this.cost=cost;
         this.tell=tell;
@@ -84,6 +91,24 @@ public class Camp {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public double getAddressLatitude() {
+        return addressLatitude;
+    }
+
+    public void setAddressLatitude(double addressLatitude) {
+        this.addressLatitude = addressLatitude;
+    }
+
+    public double getAddressLongtitude() {
+        return addressLongtitude;
+    }
+
+    public void setAddressLongtitude(double addressLongtitude) {
+        this.addressLongtitude = addressLongtitude;
+    }
+
+
 
     public String getCity() {
         return city;

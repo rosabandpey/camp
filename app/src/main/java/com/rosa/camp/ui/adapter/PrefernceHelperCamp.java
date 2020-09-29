@@ -9,6 +9,8 @@ public class PrefernceHelperCamp {
     private final String DESCRIPTION="description";
     private final String TELL="tell";
     private final String ADDRESS="address";
+    private final String ADDRESSLATITUDE="addressLatitude";
+    private final String ADDRESSLONGTITUDE="addressLongtitude";
     private final String CITY="city";
     private final String PARKING="parking";
     private final String COST="cost";
@@ -65,15 +67,35 @@ public class PrefernceHelperCamp {
     }
 
 
-    public void putAddress(String address){
+    public String getADDRESS() {
+        return  sharedPreferences.getString(ADDRESS,"");
+    }
+    public void putADDRESS(String adress) {
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString(ADDRESS,address);
+        editor.putString(ADDRESS,adress);
         editor.commit();
     }
 
-    public String getADDRESS(){
-        return  sharedPreferences.getString(ADDRESS,"");
+    public void putAddressLatitude(double addressLatitude){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putLong(ADDRESSLATITUDE,Double.doubleToRawLongBits(addressLatitude));
+        editor.commit();
     }
+
+    public double getADDRESSLatitude(){
+        return  sharedPreferences.getLong(ADDRESSLATITUDE,Double.doubleToLongBits(0));
+    }
+
+    public void putAddressLongtitude(double addressLongtitude){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putLong(ADDRESSLONGTITUDE,Double.doubleToRawLongBits(addressLongtitude));
+        editor.commit();
+    }
+
+    public double getADDRESSLongtitude(){
+        return  sharedPreferences.getLong(ADDRESSLONGTITUDE,Double.doubleToLongBits(0));
+    }
+
 
     public void putTELL(String tell){
         SharedPreferences.Editor editor=sharedPreferences.edit();

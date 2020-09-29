@@ -114,6 +114,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
     LatLng address;
     LatLng mapTargetLat;
     private static final int LAUNCH_ADDRESS_ACTIVITY=1;
+    String addressDescription;
 
     @Override
     public void onClick(View view) {
@@ -122,6 +123,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
             Intent i = new Intent(this, RegisterCampActivity.class);
             i.putExtra("latitude",address.getLatitude());
             i.putExtra("Longtitude",address.getLongitude());
+            i.putExtra("addressDescription",addressDescription);
             setResult(LAUNCH_ADDRESS_ACTIVITY,i);
             finish();
 
@@ -436,9 +438,9 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
                         mProgressBar.setVisibility(View.GONE);
                         mTextView.setVisibility(View.VISIBLE);
 
-                        String address = result.getAddressCompact();
+                        addressDescription = result.getAddressCompact();
                         if (address != null) {
-                            mTextView.setText(address);
+                            mTextView.setText(addressDescription);
                         } else {
                             mTextView.setText("آدرسی یافت نشد");
                         }

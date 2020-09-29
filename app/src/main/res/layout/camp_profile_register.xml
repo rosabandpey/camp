@@ -111,7 +111,7 @@
             app:layout_column="3"
             app:layout_gravity="center_horizontal"
             android:text="آدرس از روی نقشه"
-            android:onClick="@{(v)-> CampProfileViewModel.onClickAddress(v)}"
+            android:onClick="@{(v)-> CampProfileViewModel.selectAddress(v)}"
             >
         </Button>
 
@@ -410,7 +410,7 @@
             android:id="@+id/saveButton"
             app:layout_gravity="center_horizontal"
             android:text="@string/save"
-            android:onClick="@{(v)-> CampProfileViewModel.onClick(v)}"
+            android:onClick="@{(v)-> CampProfileViewModel.saveButton(v)}"
             >
         </Button>
 
@@ -420,7 +420,7 @@
             android:id="@+id/imageButton"
             app:layout_gravity="center_horizontal"
             android:text="انتخاب تصاویر"
-            android:onClick="@{(v)-> CampProfileViewModel.onClicked(v)}"
+            android:onClick="@{(v)-> CampProfileViewModel.imageSelectButton(v)}"
             >
         </Button>
 
