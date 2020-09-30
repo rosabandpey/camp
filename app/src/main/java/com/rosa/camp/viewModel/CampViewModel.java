@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ToggleButton;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
@@ -147,6 +149,23 @@ public class CampViewModel extends BaseObservable  {
         registerCamp(context);
 
     }
+
+    public void clickToggle(View view){
+
+        boolean on = ((ToggleButton) view).isChecked();
+
+        if (on) {
+            view.setBackgroundColor(Color.GREEN);
+            Log.d("toggle","toggle");
+            // Enable vibrate
+        } else {
+            view.setBackgroundColor(Color.RED);
+            // Disable vibrate
+        }
+    }
+
+
+
 
     public void imageSelectButton(View view){
 

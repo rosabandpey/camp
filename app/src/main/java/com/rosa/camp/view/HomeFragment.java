@@ -27,6 +27,7 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     Button newCampButton;
+    Button showCamps;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -77,6 +78,8 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         newCampButton=view.findViewById(R.id.newCampButton);
         newCampButton.setOnClickListener(this::onClick);
+        showCamps=view.findViewById(R.id.showCampButton);
+        showCamps.setOnClickListener(this::onClick);
     }
 
 
@@ -86,7 +89,11 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
         if(view.getId()==R.id.newCampButton) {
             Intent intent = new Intent(view.getContext(), RegisterCampActivity.class);
             startActivity(intent);
-            Log.d("button","button is clicked");
+        }
+
+        if(view.getId()==R.id.showCampButton) {
+            Intent intent = new Intent(view.getContext(), ShowCampActivity.class);
+            startActivity(intent);
         }
 
     }

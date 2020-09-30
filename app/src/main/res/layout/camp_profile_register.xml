@@ -269,16 +269,21 @@
             />
 
 
-
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/radioButtonParking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@{CampProfileViewModel.campParking}"
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonParking"
+            android:layout_width="54dp"
+            android:layout_height="27dp"
+            android:background="@drawable/my_btn_toggle"
+            android:checked="@={CampProfileViewModel.campParking}"
+            android:onClick="@{(v)-> CampProfileViewModel.clickToggle(v)}"
+            android:textOff="پارکینگ"
+            android:textOn="پارکینگ"
             app:layout_column="0"
-            app:layout_gravity="right"
-            app:layout_row="13" />
+            app:layout_gravity="center"
+            app:layout_row="13"
+
+            />
+
 
         <ImageView
             android:id="@+id/imageViewparking"
@@ -289,19 +294,22 @@
             app:srcCompat="@drawable/parking" />
 
 
-
-
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/radioButtonBath"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@{CampProfileViewModel.campShowers}"
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonBath"
+            android:layout_width="36dp"
+            android:layout_height="27dp"
+            android:background="@drawable/my_btn_toggle"
+            android:checked="@={CampProfileViewModel.campShowers}"
+            android:onClick="@{(v)-> CampProfileViewModel.clickToggle(v)}"
+            android:textOff="حمام"
+            android:textOn="حمام"
             app:layout_column="2"
+            app:layout_gravity="center"
             app:layout_row="13"
-            app:layout_gravity="right"
 
             />
+
+
         <ImageView
             android:id="@+id/imageViewBath"
             android:layout_width="50dp"
@@ -318,17 +326,22 @@
             app:layout_columnSpan="4"
             />
 
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/radioButtonRestaurant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@{CampProfileViewModel.campResturant}"
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonRestuarant"
+            android:layout_width="58dp"
+            android:layout_height="27dp"
+            android:background="@drawable/my_btn_toggle"
+            android:checked="@={CampProfileViewModel.campResturant}"
+            android:onClick="@{(v)-> CampProfileViewModel.clickToggle(v)}"
+            android:textOff="رستوران"
+            android:textOn="رستوران"
             app:layout_column="0"
+            app:layout_gravity="center"
             app:layout_row="15"
-            app:layout_gravity="right"
 
             />
+
+
         <ImageView
             android:id="@+id/imageViewRestaurant"
             android:layout_width="50dp"
@@ -338,19 +351,22 @@
             app:srcCompat="@drawable/plate" />
 
 
-
-
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/radioButtonwc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@{CampProfileViewModel.campWc}"
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonWc"
+            android:layout_width="39dp"
+            android:layout_height="27dp"
+            android:background="@drawable/my_btn_toggle"
+            android:checked="@={CampProfileViewModel.campWc}"
+            android:onClick="@{(v)-> CampProfileViewModel.clickToggle(v)}"
+            android:textOff="wc"
+            android:textOn="wc"
             app:layout_column="2"
+            app:layout_gravity="center"
             app:layout_row="15"
-            app:layout_gravity="right"
 
             />
+
+
         <ImageView
             android:id="@+id/imageViewwc"
             android:layout_width="50dp"
@@ -367,15 +383,18 @@
             app:layout_columnSpan="4"
             />
 
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/radioButtonInternet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonwifi"
+            android:layout_width="58dp"
+            android:layout_height="27dp"
+            android:background="@drawable/my_btn_toggle"
+            android:checked="@={CampProfileViewModel.campWifi}"
+            android:onClick="@{(v)-> CampProfileViewModel.clickToggle(v)}"
+            android:textOff="Wifi"
+            android:textOn="Wifi"
             app:layout_column="0"
+            app:layout_gravity="center"
             app:layout_row="17"
-            app:layout_gravity="right"
-            android:checked="@{CampProfileViewModel.campWifi}"
 
             />
 
