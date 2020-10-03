@@ -506,10 +506,6 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
                     mapTargetLat=mapboxMap.getCameraPosition().target;
 
 
-
-
-
-
                     SearchRequest requestBody = new SearchRequest.Builder(newText)
 
                             .select(SelectOptions.POI)

@@ -53,6 +53,7 @@ public class CampViewModel extends BaseObservable  {
     private static final int LAUNCH_ADDRESS_ACTIVITY=1;
     protected RegisterCampActivity activity;
     Activity host;
+    public int locationCount;
 
 
 
@@ -183,6 +184,8 @@ public class CampViewModel extends BaseObservable  {
 
     public void registerCamp(Context context) {
 
+        locationCount++;
+        preferenceHelper.putLocationCount(locationCount);
         preferenceHelper.putNAME(getCampName());
         preferenceHelper.putDescription(getCampDescription());
         preferenceHelper.putADDRESS(getCampAddress());
@@ -202,6 +205,7 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putIMAGE(getCampimg());
 
         Log.i("PreferenceHelper", getCampimg());
+        Log.i("locationCount",String.valueOf(locationCount) );
     }
 
     @Bindable

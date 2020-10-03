@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -80,6 +81,7 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -99,6 +101,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.rosa.camp.R;
 import com.mapbox.android.core.location.LocationEngineCallback;
+import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.ui.adapter.SearchViewAdapter;
 import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 
@@ -142,6 +145,9 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     private final int REQUEST_LOCATION_PERMISSION = 1;
     public static MapFragment instance=null ;
     public  static  MapFragment dFnewInstance=null;
+    PrefernceHelperCamp prefernceHelperCamp;
+    public int locationCount;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -330,8 +336,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
             Style style = mapboxMap.getStyle();
 
             if (style.getImage(MARKER_ICON_ID) == null) {
-              //  Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
-              //  Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
+                Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
                 style.addImage(MARKER_ICON_ID,BitmapFactory.decodeResource(
                                 getResources(), R.drawable.cedarmaps_marker_icon_default));
             }
@@ -446,6 +452,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     }
 
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
@@ -460,7 +467,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         searchButton.setOnClickListener(this);
         searchButton.setVisibility(View.VISIBLE);
         statusCheck();
-
+        prefernceHelperCamp = new PrefernceHelperCamp(getContext());
         //Installing Map
 
 
@@ -477,7 +484,25 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                         circleManager = new CircleManager(mapView, mapboxMap, style);
                         // TODO;
                         //Add marker to map
-                        addMarkerToMapViewAtPosition(VANAK_SQUARE);
+                       // prefernceHelperCamp.putAddressLatitude(35.24);
+                         //prefernceHelperCamp.putAddressLongtitude(50.40);
+
+                        locationCount=prefernceHelperCamp.getLocationCount();
+                      //  locationCount=1;
+                       // if(locationCount!=0) {
+                            Log.d("locationCount",String.valueOf(locationCount));
+                        //    for (int i = 0; i < locationCount; i++) {
+                                double latitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLatitude());
+                                double longtitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLongtitude());
+                                Log.d("latitude1",String.valueOf(latitude1));
+                                Log.d("longtitude1",String.valueOf(longtitude1));
+                                LatLng latLngl = new LatLng(latitude1, longtitude1);
+                                addMarkerToMapViewAtPosition(latLngl);
+
+                       //    }
+                     //   } else {
+                           // addMarkerToMapViewAtPosition(VANAK_SQUARE);
+                    //    }
                         enableLocationComponent(style);
                     }
 

@@ -32,7 +32,7 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/PersonalInfo"
+            android:text="اطلاعات کمپ"
             app:layout_column="0"
             app:layout_row="0"
             app:layout_columnSpan="4"

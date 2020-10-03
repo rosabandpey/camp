@@ -22,7 +22,8 @@ public class PrefernceHelperCamp {
     private final String WHEELCHAIRS="wheelchairs";
     private final String DRINKINGWATER="drinkingWater";
     private final String ALLOWPETS="allowpets";
-    private  final String IMAGE="image";
+    private final String IMAGE="image";
+    private final String LOCATIONCOUNT="locationCount";
 
     private SharedPreferences sharedPreferences;
     private Context context;
@@ -32,6 +33,19 @@ public class PrefernceHelperCamp {
         sharedPreferences=context.getSharedPreferences("shareCamp",Context.MODE_PRIVATE);
 
         this.context = context;
+    }
+
+
+    public void putLocationCount(int locationCount){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putInt(LOCATIONCOUNT,locationCount);
+        editor.commit();
+
+    }
+
+    public int getLocationCount(){
+
+        return sharedPreferences.getInt(LOCATIONCOUNT,0);
     }
 
     public void putIMAGE(String image){
@@ -67,9 +81,10 @@ public class PrefernceHelperCamp {
     }
 
 
-    public String getADDRESS() {
+    public String getADDRESS(String address) {
         return  sharedPreferences.getString(ADDRESS,"");
     }
+
     public void putADDRESS(String adress) {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString(ADDRESS,adress);
@@ -82,7 +97,7 @@ public class PrefernceHelperCamp {
         editor.commit();
     }
 
-    public double getADDRESSLatitude(){
+    public Long getADDRESSLatitude(){
         return  sharedPreferences.getLong(ADDRESSLATITUDE,Double.doubleToLongBits(0));
     }
 
@@ -92,7 +107,7 @@ public class PrefernceHelperCamp {
         editor.commit();
     }
 
-    public double getADDRESSLongtitude(){
+    public long getADDRESSLongtitude(){
         return  sharedPreferences.getLong(ADDRESSLONGTITUDE,Double.doubleToLongBits(0));
     }
 
