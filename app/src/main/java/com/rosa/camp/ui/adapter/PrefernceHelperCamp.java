@@ -3,6 +3,11 @@ package com.rosa.camp.ui.adapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.Nullable;
+
+import java.util.Map;
+import java.util.Set;
+
 public class PrefernceHelperCamp {
 
     private final String NAME="name";
@@ -24,11 +29,20 @@ public class PrefernceHelperCamp {
     private final String ALLOWPETS="allowpets";
     private final String IMAGE="image";
     private final String LOCATIONCOUNT="locationCount";
-
-    private SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences;
+    private static PrefernceHelperCamp prefernceHelperCamp;
     private Context context;
 
-    public PrefernceHelperCamp(Context context){
+
+    public static PrefernceHelperCamp instanceCamp(Context context){
+        if (prefernceHelperCamp==null){
+            prefernceHelperCamp=new PrefernceHelperCamp(context);
+
+            }
+            return prefernceHelperCamp;
+    }
+
+    private PrefernceHelperCamp(Context context){
 
         sharedPreferences=context.getSharedPreferences("shareCamp",Context.MODE_PRIVATE);
 

@@ -109,6 +109,7 @@ import static android.os.Looper.getMainLooper;
 import static android.service.controls.ControlsProviderService.TAG;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -147,6 +148,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public  static  MapFragment dFnewInstance=null;
     PrefernceHelperCamp prefernceHelperCamp;
     public int locationCount;
+    LatLng latLngl;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -331,15 +333,15 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     }
 
 
-    private void addMarkerToMapViewAtPosition(LatLng coordinate) {
+    private void addMarkerToMapViewAtPosition(List<LatLng> latLngs) {
         if (mapboxMap != null && mapboxMap.getStyle() != null) {
             Style style = mapboxMap.getStyle();
 
             if (style.getImage(MARKER_ICON_ID) == null) {
                 Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
                 Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
-                style.addImage(MARKER_ICON_ID,BitmapFactory.decodeResource(
-                                getResources(), R.drawable.cedarmaps_marker_icon_default));
+                style.addImage(MARKER_ICON_ID, BitmapFactory.decodeResource(
+                        getResources(), R.drawable.cedarmaps_marker_icon_default));
             }
 
             GeoJsonSource geoJsonSource;
@@ -353,9 +355,16 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 return;
             }
 
-            Feature feature = Feature.fromGeometry(
-                    Point.fromLngLat(coordinate.getLongitude(), coordinate.getLatitude()));
-            geoJsonSource.setGeoJson(feature);
+            for (int i = 0; i < latLngs.size(); i++) {
+
+                Feature feature = Feature.fromGeometry(
+                        Point.fromLngLat(latLngs.get(i).getLongitude(), latLngs.get(i).getLatitude()));
+
+
+                geoJsonSource.setGeoJson(feature);
+
+
+
 
             style.removeLayer(MARKERS_LAYER);
 
@@ -365,6 +374,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                     PropertyFactory.iconAllowOverlap(true)
             );
             style.addLayer(symbolLayer);
+
+            }
         }
     }
 
@@ -467,7 +478,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         searchButton.setOnClickListener(this);
         searchButton.setVisibility(View.VISIBLE);
         statusCheck();
-        prefernceHelperCamp = new PrefernceHelperCamp(getContext());
+        prefernceHelperCamp = PrefernceHelperCamp.instanceCamp(getContext());
         //Installing Map
 
 
@@ -487,22 +498,29 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                        // prefernceHelperCamp.putAddressLatitude(35.24);
                          //prefernceHelperCamp.putAddressLongtitude(50.40);
 
-                        locationCount=prefernceHelperCamp.getLocationCount();
+                          locationCount=prefernceHelperCamp.getLocationCount();
                       //  locationCount=1;
-                       // if(locationCount!=0) {
+                        if(locationCount!=0) {
                             Log.d("locationCount",String.valueOf(locationCount));
-                        //    for (int i = 0; i < locationCount; i++) {
+                         //   for (int i = 0; i < 2; i++) {
                                 double latitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLatitude());
                                 double longtitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLongtitude());
                                 Log.d("latitude1",String.valueOf(latitude1));
                                 Log.d("longtitude1",String.valueOf(longtitude1));
-                                LatLng latLngl = new LatLng(latitude1, longtitude1);
-                                addMarkerToMapViewAtPosition(latLngl);
+                                latLngl = new LatLng(latitude1, longtitude1);
+                                List<LatLng> symbolLayerIconFeatureList = new ArrayList<>();
+                                symbolLayerIconFeatureList.add(latLngl);
+                                symbolLayerIconFeatureList.add(VANAK_SQUARE);
 
-                       //    }
-                     //   } else {
-                           // addMarkerToMapViewAtPosition(VANAK_SQUARE);
-                    //    }
+                                addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
+
+
+                        //   }
+                        } else {
+                        //    addMarkerToMapViewAtPosition(VANAK_SQUARE);
+                        }
+
+
                         enableLocationComponent(style);
                     }
 
@@ -528,7 +546,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
                 //Set a touch event listener on the map
                 mapboxMap.addOnMapClickListener(point -> {
-                    addMarkerToMapViewAtPosition(point);
+                 //   addMarkerToMapViewAtPosition(point);
                     return true;
 
                 });

@@ -141,9 +141,11 @@ public class CampViewModel extends BaseObservable  {
     public CampViewModel (){
         camp=new Camp("","","",0,0,"","","false","",false,false,false,false,false,false,false,false,false);
         context= ContextCamp.getAppContext();
-        preferenceHelper = new PrefernceHelperCamp(context);
+        preferenceHelper = PrefernceHelperCamp.instanceCamp(context);
 
     }
+
+
 
     public void saveButton(View view){
 
