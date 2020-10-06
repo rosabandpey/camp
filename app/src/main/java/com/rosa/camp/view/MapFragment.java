@@ -73,6 +73,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
@@ -80,6 +81,7 @@ import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -108,6 +110,10 @@ import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 import static android.os.Looper.getMainLooper;
 import static android.service.controls.ControlsProviderService.TAG;
 
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -334,28 +340,31 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
 
     private void addMarkerToMapViewAtPosition(List<LatLng> latLngs) {
-        if (mapboxMap != null && mapboxMap.getStyle() != null) {
-            Style style = mapboxMap.getStyle();
 
-            if (style.getImage(MARKER_ICON_ID) == null) {
-                Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
-                Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
-                style.addImage(MARKER_ICON_ID, BitmapFactory.decodeResource(
-                        getResources(), R.drawable.cedarmaps_marker_icon_default));
-            }
 
-            GeoJsonSource geoJsonSource;
-            if (style.getSource(MARKERS_SOURCE) == null) {
-                geoJsonSource = new GeoJsonSource(MARKERS_SOURCE);
-                style.addSource(geoJsonSource);
-            } else {
-                geoJsonSource = (GeoJsonSource) style.getSource(MARKERS_SOURCE);
-            }
-            if (geoJsonSource == null) {
-                return;
-            }
+        for (int i = 0; i < latLngs.size(); i++) {
+            if (mapboxMap != null && mapboxMap.getStyle() != null) {
+                Style style = mapboxMap.getStyle();
 
-            for (int i = 0; i < latLngs.size(); i++) {
+                if (style.getImage(MARKER_ICON_ID) == null) {
+                    Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
+                    Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+                    style.addImage(MARKER_ICON_ID, BitmapFactory.decodeResource(
+                            getResources(), R.drawable.cedarmaps_marker_icon_default));
+                }
+
+                GeoJsonSource geoJsonSource;
+                if (style.getSource(MARKERS_SOURCE) == null) {
+                    geoJsonSource = new GeoJsonSource(MARKERS_SOURCE);
+                    style.addSource(geoJsonSource);
+                } else {
+                    geoJsonSource = (GeoJsonSource) style.getSource(MARKERS_SOURCE);
+                }
+                if (geoJsonSource == null) {
+                    return;
+                }
+
+
 
                 Feature feature = Feature.fromGeometry(
                         Point.fromLngLat(latLngs.get(i).getLongitude(), latLngs.get(i).getLatitude()));
@@ -364,20 +373,62 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 geoJsonSource.setGeoJson(feature);
 
 
+                style.removeLayer(MARKERS_LAYER);
 
+                SymbolLayer symbolLayer = new SymbolLayer(MARKERS_LAYER, MARKERS_SOURCE);
+                symbolLayer.withProperties(
+                        PropertyFactory.iconImage(MARKER_ICON_ID),
+                        PropertyFactory.iconAllowOverlap(true)
+                );
+                style.addLayer(symbolLayer);
 
-            style.removeLayer(MARKERS_LAYER);
-
-            SymbolLayer symbolLayer = new SymbolLayer(MARKERS_LAYER, MARKERS_SOURCE);
-            symbolLayer.withProperties(
-                    PropertyFactory.iconImage(MARKER_ICON_ID),
-                    PropertyFactory.iconAllowOverlap(true)
-            );
-            style.addLayer(symbolLayer);
 
             }
         }
     }
+
+
+    private void addSymbolSourceAndLayerToMap(String jsonName) {
+        // Add source to map
+        FeatureCollection featureCollection = FeatureCollection.fromJson(loadGeoJsonFile(jsonName));
+        GeoJsonSource geoJsonSource = new GeoJsonSource("sample_source_id", featureCollection);
+
+        mapStyle.addSource(geoJsonSource);
+
+        // Add image to map
+        mapStyle.addImage("sample_image_id", ContextCompat.getDrawable(getActivity(), R.drawable.cedarmaps_marker_icon_default));
+
+        // Add layer to map
+        SymbolLayer symbolLayer = new SymbolLayer("sample_layer_id", "sample_source_id");
+        symbolLayer.setProperties(
+                PropertyFactory.iconImage("sample_image_id"),
+                PropertyFactory.iconSize(1.5f),
+                PropertyFactory.iconOpacity(.8f),
+                PropertyFactory.textColor("#ff5252")
+        );
+        mapStyle.addLayer(symbolLayer);
+    }
+
+    private String loadGeoJsonFile(String fileName) {
+        String contents = "";
+
+        try {
+            InputStream stream =new FileInputStream(fileName);
+
+            int size = stream.available();
+            byte[] buffer = new byte[size];
+
+            stream.read(buffer);
+            stream.close();
+
+            contents = new String(buffer);
+        } catch (IOException e) {
+            // Handle exceptions here
+        }
+
+        return contents;
+    }
+
 
 
     @Override
@@ -509,10 +560,21 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                                 Log.d("longtitude1",String.valueOf(longtitude1));
                                 latLngl = new LatLng(latitude1, longtitude1);
                                 List<LatLng> symbolLayerIconFeatureList = new ArrayList<>();
-                                symbolLayerIconFeatureList.add(latLngl);
-                                symbolLayerIconFeatureList.add(VANAK_SQUARE);
 
-                                addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
+                                symbolLayerIconFeatureList.add(VANAK_SQUARE);
+                                symbolLayerIconFeatureList.add(latLngl);
+                                Gson gson = new Gson();
+
+                            try {
+                                FileWriter writer = new FileWriter("j:\\projects\\staff.json");
+                                gson.toJson(prefernceHelperCamp, writer);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Log.d("file","file not found");
+                            }
+                            addSymbolSourceAndLayerToMap("staff.json");
+
+                               // addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
 
 
                         //   }

@@ -418,7 +418,7 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void reverseGeocode(LatLng latLng1) {
+    private void reverseGeocode(LatLng latLng2) {
 
         if (TextUtils.isEmpty(mTextView.getText())) {
             mTextView.setVisibility(View.GONE);
@@ -428,8 +428,8 @@ public class AddressActivity extends AppCompatActivity  implements View.OnClickL
         mProgressBar.setVisibility(View.VISIBLE);
 
 
-        mapService.reverseGeoCode(latLng1.getLatitude(),
-                latLng1.getLongitude()
+        mapService.reverseGeoCode(latLng2.getLatitude(),
+                latLng2.getLongitude()
 
                 ,new ResponseListener<ReverseGeoCodeResponse>() {
 
