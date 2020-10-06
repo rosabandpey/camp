@@ -566,7 +566,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                                 Gson gson = new Gson();
 
                             try {
-                                FileWriter writer = new FileWriter("j:\\projects\\staff.json");
+                                FileWriter writer = new FileWriter("assets\\staff.json");
                                 gson.toJson(prefernceHelperCamp, writer);
                             } catch (IOException e) {
                                 e.printStackTrace();
