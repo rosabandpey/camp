@@ -215,7 +215,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 JsonParser jsonParser = new JsonParser();
                 JsonObject gsonObject = (JsonObject)jsonParser.parse(object.toString());
 
-               // String file=(addresslatlng);
+                String file=gsonObject.toString();
                 //String file=gson.toJson(convertToJoGeojson());
 
                // Log.d("file output",file);
