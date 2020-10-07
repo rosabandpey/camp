@@ -42,7 +42,7 @@ public class PrefernceHelperCamp {
             return prefernceHelperCamp;
     }
 
-    private PrefernceHelperCamp(Context context){
+    public PrefernceHelperCamp(Context context){
 
         sharedPreferences=context.getSharedPreferences("shareCamp",Context.MODE_PRIVATE);
 

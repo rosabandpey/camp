@@ -1,6 +1,7 @@
 package com.rosa.camp.view;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -32,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -101,19 +104,26 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.rosa.ContextCamp;
 import com.rosa.camp.R;
 import com.mapbox.android.core.location.LocationEngineCallback;
+import com.rosa.camp.ui.adapter.Addresslatlng;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.ui.adapter.SearchViewAdapter;
 import com.rosa.camp.ui.adapter.ViewPagerAdapter;
 
 import static android.os.Looper.getMainLooper;
 import static android.service.controls.ControlsProviderService.TAG;
+import static com.mapbox.mapboxsdk.Mapbox.getApplicationContext;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +165,9 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     PrefernceHelperCamp prefernceHelperCamp;
     public int locationCount;
     LatLng latLngl;
+    Context context;
+    Addresslatlng addresslatlng;
+    Button adressButton;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -173,6 +186,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -185,6 +199,35 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 trans.commit();
                 searchButton.setVisibility(View.GONE);
                 fb.setVisibility(View.GONE);
+
+                break;
+
+            case R.id.addressButton1:
+                Gson gson = new Gson();
+
+                String file=gson.toJson(addresslatlng);
+
+                Log.d("file output",file);
+
+                try {
+                    File myFile = new File("/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json");
+                    //File myFile = new File(Environment.getStorageDirectory().getPath() +"/staff.json");
+
+                    //myFile.createNewFile();
+                    FileOutputStream fOut = new FileOutputStream(myFile);
+                    OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
+                    myOutWriter.append(file);
+                    gson.toJson(addresslatlng,myOutWriter);
+
+                    myOutWriter.close();
+                    fOut.close();
+                    Log.d("staff",getApplicationContext().getPackageName().toString());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("file","file not found");
+                }
+                addSymbolSourceAndLayerToMap("staff.json");
 
                 break;
         }
@@ -528,8 +571,13 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         searchButton = view.findViewById(R.id.search_button1);
         searchButton.setOnClickListener(this);
         searchButton.setVisibility(View.VISIBLE);
+        adressButton = view.findViewById(R.id.addressButton1);
+        adressButton.setOnClickListener(this);
+
         statusCheck();
         prefernceHelperCamp = PrefernceHelperCamp.instanceCamp(getContext());
+        addresslatlng=new Addresslatlng(Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLatitude()),Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLongtitude()));
+
         //Installing Map
 
 
@@ -549,30 +597,17 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                        // prefernceHelperCamp.putAddressLatitude(35.24);
                          //prefernceHelperCamp.putAddressLongtitude(50.40);
 
-                          locationCount=prefernceHelperCamp.getLocationCount();
+                       //   locationCount=prefernceHelperCamp.getLocationCount();
                       //  locationCount=1;
                         if(locationCount!=0) {
                             Log.d("locationCount",String.valueOf(locationCount));
                          //   for (int i = 0; i < 2; i++) {
-                                double latitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLatitude());
-                                double longtitude1 = Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLongtitude());
-                                Log.d("latitude1",String.valueOf(latitude1));
-                                Log.d("longtitude1",String.valueOf(longtitude1));
-                                latLngl = new LatLng(latitude1, longtitude1);
-                                List<LatLng> symbolLayerIconFeatureList = new ArrayList<>();
 
-                                symbolLayerIconFeatureList.add(VANAK_SQUARE);
-                                symbolLayerIconFeatureList.add(latLngl);
-                                Gson gson = new Gson();
 
-                            try {
-                                FileWriter writer = new FileWriter("assets\\staff.json");
-                                gson.toJson(prefernceHelperCamp, writer);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                Log.d("file","file not found");
-                            }
-                            addSymbolSourceAndLayerToMap("staff.json");
+
+
+
+
 
                                // addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
 

@@ -22,7 +22,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         mapbox:mapbox_cameraZoomMax="20"
-        mapbox:mapbox_cameraZoomMin="1" />
+        mapbox:mapbox_cameraZoomMin="1" >
+
+        <Button
+            android:id="@+id/addressButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:padding="8dp"
+            android:text="address"
+            android:visibility="visible" />
+
+    </ir.map.sdk_map.maps.MapView>
 
     <Button
         android:id="@+id/search_button1"
@@ -34,8 +46,7 @@
         android:visibility="visible"
         />
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/showCurrentLocationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
