@@ -77,6 +77,8 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
@@ -111,6 +113,10 @@ import com.rosa.camp.ui.adapter.Addresslatlng;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.ui.adapter.SearchViewAdapter;
 import com.rosa.camp.ui.adapter.ViewPagerAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.os.Looper.getMainLooper;
 import static android.service.controls.ControlsProviderService.TAG;
@@ -205,11 +211,17 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
             case R.id.addressButton1:
                 Gson gson = new Gson();
 
-                String file=gson.toJson(addresslatlng);
+                JSONObject object =convertToJoGeojson();
+                JsonParser jsonParser = new JsonParser();
+                JsonObject gsonObject = (JsonObject)jsonParser.parse(object.toString());
 
-                Log.d("file output",file);
+               // String file=(addresslatlng);
+                //String file=gson.toJson(convertToJoGeojson());
+
+               // Log.d("file output",file);
 
                 try {
+                    //File myFile = new File("/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json");
                     File myFile = new File("/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json");
                     //File myFile = new File(Environment.getStorageDirectory().getPath() +"/staff.json");
 
@@ -227,10 +239,41 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                     e.printStackTrace();
                     Log.d("file","file not found");
                 }
-                addSymbolSourceAndLayerToMap("staff.json");
+                String filename="/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json";
+                Log.d("file",filename);
+
+                addSymbolSourceAndLayerToMap(filename);
 
                 break;
         }
+    }
+
+    public JSONObject convertToJoGeojson(){
+
+               JSONObject featureCollection = new JSONObject();
+        try {
+            featureCollection.put("type", "FeatureCollection");
+            JSONArray featureList = new JSONArray();
+            // iterate through your list
+
+                // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33]}
+                JSONObject point = new JSONObject();
+                point.put("type", "Point");
+                // construct a JSONArray from a string; can also use an array or list
+                JSONArray coord = new JSONArray("["+addresslatlng.getLongtitude1()+","+addresslatlng.getLatitude1()+"]");
+                point.put("coordinates", coord);
+                JSONObject feature = new JSONObject();
+                feature.put("geometry", point);
+                featureList.put(feature);
+                featureCollection.put("features", featureList);
+
+        } catch (JSONException e) {
+            Log.d("jsonobj",e.toString());
+        }
+        // output the result
+        System.out.println("featureCollection="+featureCollection.toString());
+     return featureCollection;
+
     }
 
     private enum State {
