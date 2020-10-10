@@ -133,6 +133,7 @@ import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -209,27 +210,27 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 break;
 
             case R.id.addressButton1:
-                Gson gson = new Gson();
+               // Gson gson = new Gson();
 
-                JSONObject object =convertToJoGeojson();
-                JsonParser jsonParser = new JsonParser();
-                JsonObject gsonObject = (JsonObject)jsonParser.parse(object.toString());
+                //String object =convertToJoGeojson();
+                //JsonParser jsonParser = new JsonParser();
+                //JsonObject gsonObject = (JsonObject)jsonParser.parse(object.toString());
 
-                String file=gsonObject.toString();
+                String file=convertToJoGeojson();
                 //String file=gson.toJson(convertToJoGeojson());
 
-               // Log.d("file output",file);
-
+                Log.d("file output",file);
+                String  fileName="/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.geojson";
                 try {
-                    //File myFile = new File("/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json");
-                    File myFile = new File("/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json");
+                    File myFile = new File("/data/data/" + getApplicationContext().getPackageName()+ "/" +"staff.geojson");
+                    //File myFile = new File( +"sample_file.geojson");
                     //File myFile = new File(Environment.getStorageDirectory().getPath() +"/staff.json");
 
                     //myFile.createNewFile();
                     FileOutputStream fOut = new FileOutputStream(myFile);
                     OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
                     myOutWriter.append(file);
-                    gson.toJson(addresslatlng,myOutWriter);
+                   // gson.toJson(addresslatlng,myOutWriter);
 
                     myOutWriter.close();
                     fOut.close();
@@ -239,16 +240,16 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                     e.printStackTrace();
                     Log.d("file","file not found");
                 }
-                String filename="/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.json";
-                Log.d("file",filename);
 
-                addSymbolSourceAndLayerToMap(filename);
+
+
+                addSymbolSourceAndLayerToMap(fileName);
 
                 break;
         }
     }
 
-    public JSONObject convertToJoGeojson(){
+    public String convertToJoGeojson(){
 
                JSONObject featureCollection = new JSONObject();
         try {
@@ -256,14 +257,41 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
             JSONArray featureList = new JSONArray();
             // iterate through your list
 
+
+                JSONObject properties=new JSONObject();
+
                 // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33]}
                 JSONObject point = new JSONObject();
                 point.put("type", "Point");
+
+
                 // construct a JSONArray from a string; can also use an array or list
                 JSONArray coord = new JSONArray("["+addresslatlng.getLongtitude1()+","+addresslatlng.getLatitude1()+"]");
                 point.put("coordinates", coord);
                 JSONObject feature = new JSONObject();
+                feature.put("type", "Feature");
+                feature.put("properties",properties);
                 feature.put("geometry", point);
+
+
+        /*    {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          39.7265625,
+          26.745610382199022
+        ]
+      }
+    }
+  ]
+} */
+
+
                 featureList.put(feature);
                 featureCollection.put("features", featureList);
 
@@ -272,7 +300,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         }
         // output the result
         System.out.println("featureCollection="+featureCollection.toString());
-     return featureCollection;
+     return featureCollection.toString();
 
     }
 
@@ -482,7 +510,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         mapStyle.addSource(geoJsonSource);
 
         // Add image to map
-        mapStyle.addImage("sample_image_id", ContextCompat.getDrawable(getActivity(), R.drawable.cedarmaps_marker_icon_default));
+        mapStyle.addImage("sample_image_id", Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(), R.drawable.cedarmaps_marker_icon_default)));
 
         // Add layer to map
         SymbolLayer symbolLayer = new SymbolLayer("sample_layer_id", "sample_source_id");
@@ -499,7 +527,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         String contents = "";
 
         try {
-            InputStream stream =new FileInputStream(fileName);
+            InputStream stream = new FileInputStream(fileName);
 
             int size = stream.available();
             byte[] buffer = new byte[size];
