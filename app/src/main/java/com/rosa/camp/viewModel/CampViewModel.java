@@ -19,10 +19,13 @@ import androidx.databinding.Bindable;
 import com.rosa.ContextCamp;
 import com.rosa.camp.BR;
 import com.rosa.camp.model.Camp;
+import com.rosa.camp.ui.adapter.Addresslatlng;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.view.AddressActivity;
 import com.rosa.camp.view.MapActivity;
 import com.rosa.camp.view.RegisterCampActivity;
+
+import java.util.List;
 
 public class CampViewModel extends BaseObservable  {
 
@@ -54,6 +57,7 @@ public class CampViewModel extends BaseObservable  {
     protected RegisterCampActivity activity;
     Activity host;
     public int locationCount;
+    Addresslatlng addresslatlng;
 
 
 
@@ -142,7 +146,7 @@ public class CampViewModel extends BaseObservable  {
         camp=new Camp("","","",0,0,"","","false","",false,false,false,false,false,false,false,false,false);
         context= ContextCamp.getAppContext();
         preferenceHelper = PrefernceHelperCamp.instanceCamp(context);
-
+        addresslatlng=Addresslatlng.getAddressInstance();
     }
 
 
@@ -187,12 +191,15 @@ public class CampViewModel extends BaseObservable  {
     public void registerCamp(Context context) {
 
         locationCount++;
+
         preferenceHelper.putLocationCount(locationCount);
         preferenceHelper.putNAME(getCampName());
         preferenceHelper.putDescription(getCampDescription());
         preferenceHelper.putADDRESS(getCampAddress());
         preferenceHelper.putAddressLatitude(getCampAddressLatitude());
+        addresslatlng.setLatitude1(getCampAddressLatitude());
         preferenceHelper.putAddressLongtitude(getCampAddressLongtitude());
+        addresslatlng.setLongtitude1(getCampAddressLongtitude());
         preferenceHelper.putCITY(getCampCity());
         preferenceHelper.putCOST(getCampCost());
         preferenceHelper.putPARKING(isCampParking());
@@ -207,7 +214,7 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putIMAGE(getCampimg());
 
         Log.i("PreferenceHelper", getCampimg());
-        Log.i("locationCount",String.valueOf(locationCount) );
+        Log.i("locationCount",String.valueOf(addresslatlng.getLatitude1().size()) );
     }
 
     @Bindable

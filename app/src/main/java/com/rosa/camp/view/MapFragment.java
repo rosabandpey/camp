@@ -170,10 +170,11 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     public static MapFragment instance=null ;
     public  static  MapFragment dFnewInstance=null;
     PrefernceHelperCamp prefernceHelperCamp;
-    public int locationCount;
+    public int locationLatitudeCount;
+    public int locationLatLongCount;
     LatLng latLngl;
     Context context;
-    Addresslatlng addresslatlng;
+    public Addresslatlng addresslatlng;
     Button adressButton;
 
 
@@ -210,27 +211,18 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 break;
 
             case R.id.addressButton1:
-               // Gson gson = new Gson();
-
-                //String object =convertToJoGeojson();
-                //JsonParser jsonParser = new JsonParser();
-                //JsonObject gsonObject = (JsonObject)jsonParser.parse(object.toString());
 
                 String file=convertToJoGeojson();
-                //String file=gson.toJson(convertToJoGeojson());
 
                 Log.d("file output",file);
                 String  fileName="/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.geojson";
                 try {
                     File myFile = new File("/data/data/" + getApplicationContext().getPackageName()+ "/" +"staff.geojson");
-                    //File myFile = new File( +"sample_file.geojson");
-                    //File myFile = new File(Environment.getStorageDirectory().getPath() +"/staff.json");
 
-                    //myFile.createNewFile();
                     FileOutputStream fOut = new FileOutputStream(myFile);
                     OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
                     myOutWriter.append(file);
-                   // gson.toJson(addresslatlng,myOutWriter);
+
 
                     myOutWriter.close();
                     fOut.close();
@@ -253,47 +245,26 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
                JSONObject featureCollection = new JSONObject();
         try {
+            addresslatlng=Addresslatlng.getAddressInstance();
             featureCollection.put("type", "FeatureCollection");
             JSONArray featureList = new JSONArray();
             // iterate through your list
-
-
-                JSONObject properties=new JSONObject();
-
+            JSONObject properties=new JSONObject();
+            locationLatitudeCount=addresslatlng.getLatitude1().size();
+            for (int i=0;i<locationLatitudeCount;i++) {
                 // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33]}
                 JSONObject point = new JSONObject();
                 point.put("type", "Point");
-
-
                 // construct a JSONArray from a string; can also use an array or list
-                JSONArray coord = new JSONArray("["+addresslatlng.getLongtitude1()+","+addresslatlng.getLatitude1()+"]");
+                JSONArray coord = new JSONArray("[" + addresslatlng.getLongtitude1().get(i) + "," + addresslatlng.getLatitude1().get(i) + "]");
                 point.put("coordinates", coord);
                 JSONObject feature = new JSONObject();
                 feature.put("type", "Feature");
-                feature.put("properties",properties);
+                feature.put("properties", properties);
                 feature.put("geometry", point);
-
-
-        /*    {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          39.7265625,
-          26.745610382199022
-        ]
-      }
-    }
-  ]
-} */
-
-
                 featureList.put(feature);
-                featureCollection.put("features", featureList);
+            }
+            featureCollection.put("features", featureList);
 
         } catch (JSONException e) {
             Log.d("jsonobj",e.toString());
@@ -453,10 +424,10 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     }
 
 
-    private void addMarkerToMapViewAtPosition(List<LatLng> latLngs) {
+    private void addMarkerToMapViewAtPosition(LatLng latLngs) {
 
 
-        for (int i = 0; i < latLngs.size(); i++) {
+
             if (mapboxMap != null && mapboxMap.getStyle() != null) {
                 Style style = mapboxMap.getStyle();
 
@@ -481,7 +452,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
 
                 Feature feature = Feature.fromGeometry(
-                        Point.fromLngLat(latLngs.get(i).getLongitude(), latLngs.get(i).getLatitude()));
+                        Point.fromLngLat(latLngs.getLongitude(), latLngs.getLatitude()));
 
 
                 geoJsonSource.setGeoJson(feature);
@@ -497,7 +468,7 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                 style.addLayer(symbolLayer);
 
 
-            }
+
         }
     }
 
@@ -647,7 +618,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
         statusCheck();
         prefernceHelperCamp = PrefernceHelperCamp.instanceCamp(getContext());
-        addresslatlng=new Addresslatlng(Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLatitude()),Double.longBitsToDouble(prefernceHelperCamp.getADDRESSLongtitude()));
+
+
 
         //Installing Map
 
@@ -665,28 +637,8 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
                         circleManager = new CircleManager(mapView, mapboxMap, style);
                         // TODO;
                         //Add marker to map
-                       // prefernceHelperCamp.putAddressLatitude(35.24);
-                         //prefernceHelperCamp.putAddressLongtitude(50.40);
 
-                       //   locationCount=prefernceHelperCamp.getLocationCount();
-                      //  locationCount=1;
-                        if(locationCount!=0) {
-                            Log.d("locationCount",String.valueOf(locationCount));
-                         //   for (int i = 0; i < 2; i++) {
-
-
-
-
-
-
-
-                               // addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
-
-
-                        //   }
-                        } else {
-                        //    addMarkerToMapViewAtPosition(VANAK_SQUARE);
-                        }
+                        // addMarkerToMapViewAtPosition(symbolLayerIconFeatureList);
 
 
                         enableLocationComponent(style);

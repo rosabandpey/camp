@@ -109,6 +109,9 @@ public class PrefernceHelperCamp {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putLong(ADDRESSLATITUDE,Double.doubleToRawLongBits(addressLatitude));
         editor.commit();
+
+
+
     }
 
     public Long getADDRESSLatitude(){
