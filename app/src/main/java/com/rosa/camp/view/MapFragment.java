@@ -251,11 +251,13 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
             // iterate through your list
             JSONObject properties=new JSONObject();
             locationLatitudeCount=addresslatlng.getLatitude1().size();
+            Log.d("count",String.valueOf(locationLatitudeCount));
             for (int i=0;i<locationLatitudeCount;i++) {
                 // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33]}
                 JSONObject point = new JSONObject();
                 point.put("type", "Point");
                 // construct a JSONArray from a string; can also use an array or list
+                Log.d("count"+String.valueOf(i),String.valueOf(addresslatlng.getLongtitude1().get(i)));
                 JSONArray coord = new JSONArray("[" + addresslatlng.getLongtitude1().get(i) + "," + addresslatlng.getLatitude1().get(i) + "]");
                 point.put("coordinates", coord);
                 JSONObject feature = new JSONObject();

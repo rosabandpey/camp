@@ -15,6 +15,8 @@ import android.widget.Button;
 
 import com.rosa.camp.R;
 
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
@@ -28,6 +30,7 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
     private static final String ARG_PARAM2 = "param2";
     Button newCampButton;
     Button showCamps;
+    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=1;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -84,11 +87,35 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
 
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LAUNCH_REGISTERCAMP_ACTIVITY) {
+
+            // The user picked a image.
+            // The Intent's data Uri identifies which item was selected.
+            if (data != null) {
+
+                Bundle extras = data.getExtras();
+                if (extras == null) {
+                    return;
+                }
+                ArrayList list=extras.getParcelableArrayList("Longtitude");
+                Log.d("array","array is finished");
+                Log.d("array",list.get(0).toString());
+            }
+            //     }
+        }
+    }
+
+
+
+
+    @Override
     public void onClick(View view) {
 
         if(view.getId()==R.id.newCampButton) {
             Intent intent = new Intent(view.getContext(), RegisterCampActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,LAUNCH_REGISTERCAMP_ACTIVITY);
         }
 
         if(view.getId()==R.id.showCampButton) {

@@ -15,16 +15,22 @@ import android.widget.ToggleButton;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+import androidx.fragment.app.FragmentTransaction;
 //import androidx.databinding.library.baseAdapters.BR;
 import com.rosa.ContextCamp;
 import com.rosa.camp.BR;
+import com.rosa.camp.R;
 import com.rosa.camp.model.Camp;
 import com.rosa.camp.ui.adapter.Addresslatlng;
 import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.view.AddressActivity;
+import com.rosa.camp.view.DirectionFragment;
+import com.rosa.camp.view.HomeActivity;
 import com.rosa.camp.view.MapActivity;
+import com.rosa.camp.view.MapFragment;
 import com.rosa.camp.view.RegisterCampActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CampViewModel extends BaseObservable  {
@@ -54,11 +60,13 @@ public class CampViewModel extends BaseObservable  {
     private Uri cImageUri;
     private static final int PICK_IMAGE_REQUEST = 0;
     private static final int LAUNCH_ADDRESS_ACTIVITY=1;
+    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=1;
     protected RegisterCampActivity activity;
     Activity host;
     public int locationCount;
     Addresslatlng addresslatlng;
-
+    ArrayList<Double> listLatitude =new ArrayList<>();
+    ArrayList<Double> listLongtitude =new ArrayList<>();
 
 
    /* public void permissionsCheck() {
@@ -125,11 +133,13 @@ public class CampViewModel extends BaseObservable  {
                     // do something with the data
                     Log.d("latitude", latitude.toString());
                     setCampAddressLatitude(latitude);
+                    addToListLatitude(latitude);
                 }
                 if (longtitude != null) {
                     // do something with the data
                     Log.d("Longtitude", longtitude.toString());
                     setCampAddressLongtitude(longtitude);
+                    addToListLatitude(longtitude);
                 }
                 if (address != null) {
                     // do something with the data
@@ -151,9 +161,10 @@ public class CampViewModel extends BaseObservable  {
 
 
 
+
     public void saveButton(View view){
 
-        registerCamp(context);
+        registerCamp(view);
 
     }
 
@@ -171,7 +182,17 @@ public class CampViewModel extends BaseObservable  {
         }
     }
 
+    public void addToListLatitude(double item){
 
+            listLatitude.add(item);
+
+    }
+
+    public void addToLisLongtitude(double item){
+
+        listLongtitude.add(item);
+
+    }
 
 
     public void imageSelectButton(View view){
@@ -188,7 +209,9 @@ public class CampViewModel extends BaseObservable  {
 
     }
 
-    public void registerCamp(Context context) {
+
+
+    public void registerCamp(View view) {
 
         locationCount++;
 
@@ -197,9 +220,9 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putDescription(getCampDescription());
         preferenceHelper.putADDRESS(getCampAddress());
         preferenceHelper.putAddressLatitude(getCampAddressLatitude());
-        addresslatlng.setLatitude1(getCampAddressLatitude());
+        addresslatlng.setLatitude1(listLatitude);
         preferenceHelper.putAddressLongtitude(getCampAddressLongtitude());
-        addresslatlng.setLongtitude1(getCampAddressLongtitude());
+        addresslatlng.setLongtitude1(listLongtitude);
         preferenceHelper.putCITY(getCampCity());
         preferenceHelper.putCOST(getCampCost());
         preferenceHelper.putPARKING(isCampParking());
@@ -215,6 +238,14 @@ public class CampViewModel extends BaseObservable  {
 
         Log.i("PreferenceHelper", getCampimg());
         Log.i("locationCount",String.valueOf(addresslatlng.getLatitude1().size()) );
+
+        Intent i = new Intent(context, HomeActivity.class);
+        i.putExtra("Longtitude",listLongtitude);
+        i.putExtra("latitude",listLongtitude);
+        host = (Activity) view.getContext();
+        host.setResult(LAUNCH_REGISTERCAMP_ACTIVITY,i);
+        host.finish();
+
     }
 
     @Bindable
