@@ -30,7 +30,7 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
     private static final String ARG_PARAM2 = "param2";
     Button newCampButton;
     Button showCamps;
-    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=1;
+    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=123;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -95,13 +95,20 @@ public class HomeFragment extends Fragment  implements View.OnClickListener {
             // The Intent's data Uri identifies which item was selected.
             if (data != null) {
 
-                Bundle extras = data.getExtras();
+                Bundle extras = data.getBundleExtra("BUNDLE");
+
                 if (extras == null) {
                     return;
                 }
-                ArrayList list=extras.getParcelableArrayList("Longtitude");
-                Log.d("array","array is finished");
-                Log.d("array",list.get(0).toString());
+               // ArrayList list=extras.getParcelableArrayList("Longtitude");
+
+
+
+
+                ArrayList<Double> Longtitude = (ArrayList<Double>) extras.getSerializable("Longtitude");
+                ArrayList<Double> latitude = (ArrayList<Double>) extras.getSerializable("latitude");
+                Log.d("arrayfound",Longtitude.get(0).toString());
+
             }
             //     }
         }

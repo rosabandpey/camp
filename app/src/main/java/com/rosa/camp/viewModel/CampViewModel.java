@@ -30,6 +30,7 @@ import com.rosa.camp.view.MapActivity;
 import com.rosa.camp.view.MapFragment;
 import com.rosa.camp.view.RegisterCampActivity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,11 +61,11 @@ public class CampViewModel extends BaseObservable  {
     private Uri cImageUri;
     private static final int PICK_IMAGE_REQUEST = 0;
     private static final int LAUNCH_ADDRESS_ACTIVITY=1;
-    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=1;
+    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=123;
     protected RegisterCampActivity activity;
     Activity host;
     public int locationCount;
-    Addresslatlng addresslatlng;
+    //Addresslatlng addresslatlng;
     ArrayList<Double> listLatitude =new ArrayList<>();
     ArrayList<Double> listLongtitude =new ArrayList<>();
 
@@ -139,7 +140,7 @@ public class CampViewModel extends BaseObservable  {
                     // do something with the data
                     Log.d("Longtitude", longtitude.toString());
                     setCampAddressLongtitude(longtitude);
-                    addToListLatitude(longtitude);
+                    addToLisLongtitude(longtitude);
                 }
                 if (address != null) {
                     // do something with the data
@@ -156,7 +157,7 @@ public class CampViewModel extends BaseObservable  {
         camp=new Camp("","","",0,0,"","","false","",false,false,false,false,false,false,false,false,false);
         context= ContextCamp.getAppContext();
         preferenceHelper = PrefernceHelperCamp.instanceCamp(context);
-        addresslatlng=Addresslatlng.getAddressInstance();
+      //  addresslatlng=Addresslatlng.getAddressInstance();
     }
 
 
@@ -220,9 +221,9 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putDescription(getCampDescription());
         preferenceHelper.putADDRESS(getCampAddress());
         preferenceHelper.putAddressLatitude(getCampAddressLatitude());
-        addresslatlng.setLatitude1(listLatitude);
+       // addresslatlng.setLatitude1(listLatitude);
         preferenceHelper.putAddressLongtitude(getCampAddressLongtitude());
-        addresslatlng.setLongtitude1(listLongtitude);
+       // addresslatlng.setLongtitude1(listLongtitude);
         preferenceHelper.putCITY(getCampCity());
         preferenceHelper.putCOST(getCampCost());
         preferenceHelper.putPARKING(isCampParking());
@@ -237,14 +238,27 @@ public class CampViewModel extends BaseObservable  {
         preferenceHelper.putIMAGE(getCampimg());
 
         Log.i("PreferenceHelper", getCampimg());
-        Log.i("locationCount",String.valueOf(addresslatlng.getLatitude1().size()) );
+      //  Log.i("locationCount",String.valueOf(addresslatlng.getLatitude1().size()) );
 
-        Intent i = new Intent(context, HomeActivity.class);
-        i.putExtra("Longtitude",listLongtitude);
-        i.putExtra("latitude",listLongtitude);
+        Intent intent = new Intent(context, HomeActivity.class);
+        Bundle args = new Bundle();
+       // i.putExtra("Longtitude",(Serializable) listLongtitude);
+       // i.putExtra("latitude",(Serializable) listLongtitude);
+        args.putSerializable("Longtitude",(Serializable)listLongtitude);
+        args.putSerializable("latitude",(Serializable)listLatitude);
+        intent.putExtra("BUNDLE",args);
+
         host = (Activity) view.getContext();
-        host.setResult(LAUNCH_REGISTERCAMP_ACTIVITY,i);
+        host.startActivity(intent);
+        host.setResult(LAUNCH_REGISTERCAMP_ACTIVITY,intent);
         host.finish();
+
+
+
+
+
+
+
 
     }
 
