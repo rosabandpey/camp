@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -41,7 +42,9 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -137,7 +140,7 @@ public class HomeFragment extends Fragment   implements PermissionsListener, Vie
     Button adressButton;
     ArrayList<Double> longtitude;
     ArrayList<Double> latitude;
-
+    GeoJsonSource geoJsonSource;
 
 
 
@@ -252,7 +255,7 @@ public class HomeFragment extends Fragment   implements PermissionsListener, Vie
 
                 //Set a touch event listener on the map
                 mapboxMap.addOnMapClickListener(point -> {
-                    //   addMarkerToMapViewAtPosition(point);
+                    addMarkerToMapViewAtPosition(point);
                     return true;
 
                 });
@@ -286,7 +289,42 @@ public class HomeFragment extends Fragment   implements PermissionsListener, Vie
 
 
     }
+    private void addMarkerToMapViewAtPosition(LatLng coordinate) {
+        if (mapboxMap != null && mapboxMap.getStyle() != null) {
+            Style style = mapboxMap.getStyle();
 
+            if (style.getImage(MARKER_ICON_ID) == null) {
+                //  Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
+                //  Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+                style.addImage(MARKER_ICON_ID, BitmapFactory.decodeResource(
+                        getResources(), R.drawable.cedarmaps_marker_icon_default));
+            }
+
+            GeoJsonSource geoJsonSource;
+            if (style.getSource(MARKERS_SOURCE) == null) {
+                geoJsonSource = new GeoJsonSource(MARKERS_SOURCE);
+                style.addSource(geoJsonSource);
+            } else {
+                geoJsonSource = (GeoJsonSource) style.getSource(MARKERS_SOURCE);
+            }
+            if (geoJsonSource == null) {
+                return;
+            }
+
+            Feature feature = Feature.fromGeometry(
+                    Point.fromLngLat(coordinate.getLongitude(), coordinate.getLatitude()));
+            geoJsonSource.setGeoJson(feature);
+
+            style.removeLayer(MARKERS_LAYER);
+
+            SymbolLayer symbolLayer = new SymbolLayer(MARKERS_LAYER, MARKERS_SOURCE);
+            symbolLayer.withProperties(
+                    PropertyFactory.iconImage(MARKER_ICON_ID),
+                    PropertyFactory.iconAllowOverlap(true)
+            );
+            style.addLayer(symbolLayer);
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -359,10 +397,7 @@ public class HomeFragment extends Fragment   implements PermissionsListener, Vie
                     Log.d("file","file not found");
                 }
 
-
-
                 addSymbolSourceAndLayerToMap(fileName);
-
                 break;
         }
 
@@ -521,23 +556,40 @@ public class HomeFragment extends Fragment   implements PermissionsListener, Vie
 
     private void addSymbolSourceAndLayerToMap(String jsonName) {
         // Add source to map
-        FeatureCollection featureCollection = FeatureCollection.fromJson(loadGeoJsonFile(jsonName));
-        GeoJsonSource geoJsonSource = new GeoJsonSource("sample_source_id", featureCollection);
 
-        mapStyle.addSource(geoJsonSource);
+        if (mapboxMap != null && mapboxMap.getStyle() != null) {
+            Style style = mapboxMap.getStyle();
 
-        // Add image to map
-        mapStyle.addImage("sample_image_id", Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(), R.drawable.cedarmaps_marker_icon_default)));
+            if (style.getImage(MARKER_ICON_ID) == null) {
+                //  Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.cedarmaps_marker_icon_default, null);
+                //  Bitmap mBitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+                style.addImage(MARKER_ICON_ID, BitmapFactory.decodeResource(
+                        getResources(), R.drawable.cedarmaps_marker_icon_default));
+            }
 
-        // Add layer to map
-        SymbolLayer symbolLayer = new SymbolLayer("sample_layer_id", "sample_source_id");
-        symbolLayer.setProperties(
-                PropertyFactory.iconImage("sample_image_id"),
-                PropertyFactory.iconSize(1.5f),
-                PropertyFactory.iconOpacity(.8f),
-                PropertyFactory.textColor("#ff5252")
-        );
-        mapStyle.addLayer(symbolLayer);
+            FeatureCollection featureCollection = FeatureCollection.fromJson(loadGeoJsonFile(jsonName));
+
+            if (style.getSource(MARKERS_SOURCE) == null) {
+
+                geoJsonSource = new GeoJsonSource(MARKERS_SOURCE, featureCollection);
+                style.addSource(geoJsonSource);
+
+            } else {
+                geoJsonSource = (GeoJsonSource) style.getSource(MARKERS_SOURCE);
+            }
+            if (geoJsonSource == null) {
+                return;
+            }
+
+            style.removeLayer(MARKERS_LAYER);
+
+            SymbolLayer symbolLayer = new SymbolLayer(MARKERS_LAYER, MARKERS_SOURCE);
+            symbolLayer.withProperties(
+                    PropertyFactory.iconImage(MARKER_ICON_ID),
+                    PropertyFactory.iconAllowOverlap(true)
+            );
+            style.addLayer(symbolLayer);
+        }
     }
 
     private String loadGeoJsonFile(String fileName) {

@@ -251,9 +251,9 @@ public class CampViewModel extends BaseObservable  {
 
         host = (Activity) view.getContext();
 
-        host.startActivity(intent);
+       // host.startActivity(intent);
         host.setResult(LAUNCH_REGISTERCAMP_ACTIVITY,intent);
-        //host.finish();
+        host.finish();
        // host.onBackPressed();
 
 
