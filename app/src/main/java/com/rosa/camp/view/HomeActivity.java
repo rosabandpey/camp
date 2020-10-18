@@ -36,6 +36,7 @@ public class HomeActivity extends AppCompatActivity  {
     MapFragment instance;
     DirectionFragment dInstance;
     HomeFragment homeFragment;
+    MapFragment mapFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,8 @@ public class HomeActivity extends AppCompatActivity  {
         viewPager= findViewById(R.id.view_pager);
         adapter=new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new LoginFragment(),"My Camp");
-        adapter.addFrag(new MapFragment(),"Map");
+        mapFragment=new MapFragment();
+        adapter.addFrag(mapFragment,"Map");
         homeFragment=new HomeFragment();
         adapter.addFrag(homeFragment,"Home");
        // adapter.addFrag(dInstance,"Home");

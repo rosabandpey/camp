@@ -176,7 +176,9 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
     Context context;
     public Addresslatlng addresslatlng;
     Button adressButton;
-
+    private static final int LAUNCH_REGISTERCAMP_ACTIVITY=123;
+    ArrayList<Double> longtitude;
+    ArrayList<Double> latitude;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -210,55 +212,59 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
 
                 break;
 
-            case R.id.addressButton1:
 
-                String file=convertToJoGeojson();
-
-                Log.d("file output",file);
-                String  fileName="/data/data/" + getApplicationContext().getPackageName() + "/" +"staff.geojson";
-                try {
-                    File myFile = new File("/data/data/" + getApplicationContext().getPackageName()+ "/" +"staff.geojson");
-
-                    FileOutputStream fOut = new FileOutputStream(myFile);
-                    OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
-                    myOutWriter.append(file);
-
-
-                    myOutWriter.close();
-                    fOut.close();
-                    Log.d("staff",getApplicationContext().getPackageName().toString());
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.d("file","file not found");
-                }
-
-
-
-                addSymbolSourceAndLayerToMap(fileName);
-
-                break;
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LAUNCH_REGISTERCAMP_ACTIVITY) {
+
+            // The user picked a image.
+            // The Intent's data Uri identifies which item was selected.
+            if (data != null) {
+
+                Bundle extras = data.getBundleExtra("BUNDLE");
+
+                if (extras == null) {
+                    return;
+                }
+                // ArrayList list=extras.getParcelableArrayList("Longtitude");
+
+
+
+
+                longtitude = (ArrayList<Double>) extras.getSerializable("Longtitude");
+                latitude = (ArrayList<Double>) extras.getSerializable("latitude");
+              //  Log.d("arrayfound",longtitude.get(0).toString());
+                Log.d("arrayfound1",String.valueOf(longtitude.size()));
+            }
+            //     }
+        }
+    }
+
+
+
 
     public String convertToJoGeojson(){
 
                JSONObject featureCollection = new JSONObject();
         try {
-            addresslatlng=Addresslatlng.getAddressInstance();
+           // addresslatlng=Addresslatlng.getAddressInstance();
             featureCollection.put("type", "FeatureCollection");
             JSONArray featureList = new JSONArray();
             // iterate through your list
             JSONObject properties=new JSONObject();
-            locationLatitudeCount=addresslatlng.getLatitude1().size();
+            locationLatitudeCount=longtitude.size();
             Log.d("count",String.valueOf(locationLatitudeCount));
             for (int i=0;i<locationLatitudeCount;i++) {
                 // {"geometry": {"type": "Point", "coordinates": [-94.149, 36.33]}
                 JSONObject point = new JSONObject();
                 point.put("type", "Point");
                 // construct a JSONArray from a string; can also use an array or list
-                Log.d("count"+String.valueOf(i),String.valueOf(addresslatlng.getLongtitude1().get(i)));
-                JSONArray coord = new JSONArray("[" + addresslatlng.getLongtitude1().get(i) + "," + addresslatlng.getLatitude1().get(i) + "]");
+               // Log.d("count"+String.valueOf(i),String.valueOf(addresslatlng.getLongtitude1().get(i)));
+                JSONArray coord = new JSONArray("[" + longtitude.get(i) + "," + latitude.get(i) + "]");
                 point.put("coordinates", coord);
                 JSONObject feature = new JSONObject();
                 feature.put("type", "Feature");
@@ -919,16 +925,6 @@ public class MapFragment extends Fragment implements PermissionsListener, View.O
         mapView.onResume();
 
         searchButton.setVisibility(View.VISIBLE);
-    }
-
-
-
-    private void show() {
-        searchButton.setVisibility(View.VISIBLE);
-    }
-
-    private void hide() {
-        Log.d("hide","fragment is hidden");
     }
 
 

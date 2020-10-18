@@ -3,18 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".view.HomeFragment">
+
 <FrameLayout
 android:layout_width="match_parent"
 android:layout_height="match_parent"
     >
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ir.map.sdk_map.maps.MapView
+        android:id="@+id/map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Home"
-        android:gravity="center"
-        />
+        mapbox:mapbox_cameraZoomMax="20"
+        mapbox:mapbox_cameraZoomMin="1" >
+        <Button
+            android:id="@+id/addressButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:padding="8dp"
+            android:text="address"
+            android:visibility="visible" />
+
+    </ir.map.sdk_map.maps.MapView>
 
     <Button
         android:id="@+id/newCampButton"
@@ -22,13 +36,66 @@ android:layout_height="match_parent"
         android:layout_height="wrap_content"
         android:text="New Camp" />
 
-    <Button
-        android:id="@+id/showCampButton"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/showCurrentLocationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:layout_gravity="right"
-        android:text="Show Camp" />
+        android:layout_gravity="bottom|end"
+        backgroundTint="@color/colorPrimary"
+        elevation="6dp"
+        pressedTranslationZ="12dp"
+        fabSize="normal"
+        srcCompat="@drawable/crosshairs_gps"
+        android:layout_margin="20dp"/>
+
+    <ProgressBar
+        android:id="@+id/reverse_geocode_progressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        />
+
+    <TextView
+        android:id="@+id/reverse_geocode_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="26sp"
+        android:visibility="gone"
+        android:gravity="center_horizontal" />
+
+    <LinearLayout
+        android:id="@+id/search_results_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        >
+
+        <ProgressBar
+            android:id="@+id/search_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:id="@+id/recyclerView"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+
+
+
 
 </FrameLayout>
 </LinearLayout>

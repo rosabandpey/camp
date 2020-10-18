@@ -19,6 +19,7 @@ import com.rosa.camp.R;
 import com.rosa.camp.view.AddressActivity;
 import com.rosa.camp.view.DirectionFragment;
 import com.rosa.camp.view.HomeActivity;
+import com.rosa.camp.view.HomeFragment;
 import com.rosa.camp.view.LoginFragment;
 import com.rosa.camp.view.MapFragment;
 
@@ -133,6 +134,16 @@ public class SearchViewAdapter extends RecyclerView.Adapter<SearchViewAdapter.Se
 
                         if (fragment instanceof DirectionFragment ) {
                             DirectionFragment fgf = (DirectionFragment)fragment;
+
+                            fgf.showItemOnMap(mItem);
+                        }
+                        else {
+
+                            Log.d("frag","no frag");
+                        }
+
+                        if (fragment instanceof HomeFragment ) {
+                            HomeFragment fgf = (HomeFragment) fragment;
 
                             fgf.showItemOnMap(mItem);
                         }

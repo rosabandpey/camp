@@ -26,6 +26,7 @@ import com.rosa.camp.ui.adapter.PrefernceHelperCamp;
 import com.rosa.camp.view.AddressActivity;
 import com.rosa.camp.view.DirectionFragment;
 import com.rosa.camp.view.HomeActivity;
+import com.rosa.camp.view.HomeFragment;
 import com.rosa.camp.view.MapActivity;
 import com.rosa.camp.view.MapFragment;
 import com.rosa.camp.view.RegisterCampActivity;
@@ -249,11 +250,11 @@ public class CampViewModel extends BaseObservable  {
         intent.putExtra("BUNDLE",args);
 
         host = (Activity) view.getContext();
+
         host.startActivity(intent);
         host.setResult(LAUNCH_REGISTERCAMP_ACTIVITY,intent);
-        host.finish();
-
-
+        //host.finish();
+       // host.onBackPressed();
 
 
 
